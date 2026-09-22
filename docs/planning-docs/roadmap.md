@@ -40,20 +40,20 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 ## Spotify Integration
 
 - [ ] Register Spotify application configuration and platform redirect URIs.
-- [ ] Implement Authorization Code with PKCE.
-- [ ] Securely store and refresh tokens in the main process.
+- [-] Implement Authorization Code with PKCE.
+- [x] Keep access and refresh tokens in the main process and refresh access tokens when needed.
 - [ ] Implement sign-in, sign-out, missing-scope, expiry, rate-limit, and network-error states.
-- [ ] Load public and authorized private/collaborative playlists.
-- [ ] Load albums and preserve album track order.
+- [x] Load public and authorized private/collaborative playlists through the Spotify API bridge.
+- [x] Load albums and preserve album track order through the Spotify API bridge.
 - [ ] Preserve playlist positions and duplicate playlist occurrences.
-- [x] Provide mocked playlist/album URL loading and ordered collection preview while OAuth is under construction.
+- [x] Provide playlist/album URL loading and ordered collection preview through the Spotify API bridge.
 
 ## Matching and Review
 
-- [ ] Normalize metadata and filenames.
-- [ ] Implement fuzzy candidate scoring with duration as a disambiguator.
-- [ ] Implement one-to-one assignment by collection occurrence.
-- [ ] Show every proposal, confidence, evidence, and warning.
+- [x] Normalize metadata and filenames.
+- [x] Implement initial fuzzy candidate scoring with duration as a disambiguator.
+- [x] Implement initial one-to-one assignment by collection occurrence.
+- [x] Show every proposal, confidence, evidence, and warning in the review table.
 - [ ] Support manual reassignment, exclusion, and unmatched files.
 - [ ] Preserve collection-position numbering gaps.
 
@@ -79,8 +79,8 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 **Completed checkpoint:** project foundation plus the app shell using mocked workspace data. The first usable checkpoint demonstrates the three navigation states, Settings, Help, Changelog, status bar, and preserved UI state without requiring Spotify or filesystem integration.
 
-**Next slice:** implement Spotify OAuth with PKCE, replacing the mocked source loader while preserving its collection model and review preview.
+**Next slice:** add manual reassignment/exclusion controls and strengthen OAuth callback/error coverage.
 
 ## Open Blockers
 
-- None for the shell slice. Spotify credentials will be supplied through Git-excluded development configuration and public packaged client configuration as documented in the planning docs.
+- Local Spotify credentials are required to exercise OAuth: copy `.env.example` to `.env` and provide `SPOTIFY_CLIENT_ID` plus a registered redirect URI. No client secret is needed.

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { matchFiles, type MatchProposal } from '../../shared/matching'
 import {
   ChevronDown,
   CircleHelp,
@@ -33,7 +34,7 @@ interface MockCollection {
   type: CollectionType
   name: string
   url: string
-  tracks: Array<{ position: number; artist: string; title: string; duration: string }>
+  tracks: Array<{ position: number; artist: string; title: string; duration: string; durationMs?: number }>
 }
 
 const lightThemes: Array<{ id: Theme; label: string; description: string }> = [
@@ -154,6 +155,9 @@ function Workspace({ onHelp, onStatusChange }: { onHelp: () => void; onStatusCha
   const [sourceType, setSourceType] = useState<CollectionType>('playlist')
   const [sourceUrl, setSourceUrl] = useState('https://open.spotify.com/playlist/example')
   const [collection, setCollection] = useState<MockCollection | null>(null)
+  const [sourceLoading, setSourceLoading] = useState(false)
+  const [sourceError, setSourceError] = useState('')
+  const proposals: MatchProposal[] = inventory && collection ? matchFiles((inventory.files ?? []).filter((file) => selectedPaths.has(file.path)), collection.tracks) : []
 
   const chooseFolder = async () => {
     setLoading(true)
@@ -188,24 +192,24 @@ function Workspace({ onHelp, onStatusChange }: { onHelp: () => void; onStatusCha
     onStatusChange(`${nextSelection.size} audio files selected`)
   }
 
-  const loadMockCollection = () => {
-    const tracks = sourceType === 'playlist'
-      ? [
-        { position: 1, artist: 'The Paper Kites', title: 'Bloom', duration: '3:30' },
-        { position: 2, artist: 'Khruangbin', title: 'Friday Morning', duration: '4:02' },
-        { position: 3, artist: 'Men I Trust', title: 'Show Me How', duration: '3:35' },
-        { position: 4, artist: 'Tycho', title: 'A Walk', duration: '5:19' },
-      ]
-      : [
-        { position: 1, artist: 'Bon Iver', title: 'Holocene', duration: '5:36' },
-        { position: 2, artist: 'Bon Iver', title: 'Towers', duration: '3:54' },
-        { position: 3, artist: 'Bon Iver', title: 'Michicant', duration: '3:58' },
-        { position: 4, artist: 'Bon Iver', title: 'Hinnom, TX', duration: '2:48' },
-      ]
-    const nextCollection = { type: sourceType, name: sourceType === 'playlist' ? 'Quiet Hours' : 'Bon Iver — Bon Iver', url: sourceUrl, tracks }
-    setCollection(nextCollection)
-    setSourceOpen(false)
-    onStatusChange(`${nextCollection.name} loaded (mock) · ${tracks.length} tracks`)
+  const loadSpotifyCollection = async () => {
+    setSourceLoading(true)
+    setSourceError('')
+    onStatusChange('Waiting for Spotify authorization...')
+    try {
+      await window.trackAlign.spotify.authenticate()
+      onStatusChange('Loading Spotify collection...')
+      const nextCollection = await window.trackAlign.spotify.loadCollection(sourceUrl)
+      setCollection(nextCollection)
+      setSourceOpen(false)
+      onStatusChange(`${nextCollection.name} loaded · ${nextCollection.tracks.length} tracks`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Spotify could not be connected.'
+      setSourceError(message)
+      onStatusChange('Spotify connection needs attention')
+    } finally {
+      setSourceLoading(false)
+    }
   }
 
   return <section className="workspace-page">
@@ -214,8 +218,9 @@ function Workspace({ onHelp, onStatusChange }: { onHelp: () => void; onStatusCha
       <button className="action-card primary-card" onClick={chooseFolder} disabled={loading}><div className="card-icon"><FolderOpen size={22} /></div><div><span className="card-kicker">Step 01</span><h2>{loading ? 'Inspecting folder...' : 'Choose a folder'}</h2><p>Open a local folder to inspect its audio files.</p></div><span className="card-arrow">→</span></button>
       <button className="action-card" onClick={() => setSourceOpen(true)}><div className="card-icon"><ListMusic size={22} /></div><div><span className="card-kicker">Step 02</span><h2>{collection ? collection.name : 'Connect Spotify'}</h2><p>{collection ? `${collection.tracks.length} tracks loaded in ${collection.type} order.` : 'Load a playlist or album and its original order.'}</p></div><span className="card-arrow">→</span></button>
     </div>
-    {sourceOpen && <div className="source-dialog" role="dialog" aria-label="Load Spotify collection"><div className="source-dialog-heading"><div><span className="eyebrow">Spotify source</span><h2>Load a playlist or album</h2></div><button className="toolbar-icon" onClick={() => setSourceOpen(false)} title="Close" aria-label="Close"><X size={18} /></button></div><div className="source-tabs" role="tablist" aria-label="Spotify source type"><button className={sourceType === 'playlist' ? 'selected' : ''} onClick={() => setSourceType('playlist')}>Playlist</button><button className={sourceType === 'album' ? 'selected' : ''} onClick={() => setSourceType('album')}>Album</button></div><label className="source-label">Spotify URL<input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://open.spotify.com/..." /></label><p className="source-note">Mock source loading is active while Spotify OAuth is being built. The ordered collection will feed the matching review.</p><button className="primary-button" onClick={loadMockCollection}><ListMusic size={16} />Load mock collection</button></div>}
-    {collection && <div className="collection-preview"><div className="preview-heading"><div><span className="eyebrow">Spotify collection · mock</span><h2>{collection.name}</h2></div><span className="status-pill"><span className="status-dot" />{collection.tracks.length} tracks</span></div><div className="collection-track-list">{collection.tracks.map((track) => <div className="collection-track" key={track.position}><span className="track-position">{String(track.position).padStart(2, '0')}</span><div><strong>{track.title}</strong><span>{track.artist}</span></div><span className="track-duration">{track.duration}</span></div>)}</div></div>}
+    {sourceOpen && <div className="source-dialog" role="dialog" aria-label="Load Spotify collection"><div className="source-dialog-heading"><div><span className="eyebrow">Spotify source</span><h2>Load a playlist or album</h2></div><button className="toolbar-icon" onClick={() => setSourceOpen(false)} title="Close" aria-label="Close"><X size={18} /></button></div><div className="source-tabs" role="tablist" aria-label="Spotify source type"><button className={sourceType === 'playlist' ? 'selected' : ''} onClick={() => setSourceType('playlist')}>Playlist</button><button className={sourceType === 'album' ? 'selected' : ''} onClick={() => setSourceType('album')}>Album</button></div><label className="source-label">Spotify URL<input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://open.spotify.com/..." /></label><p className="source-note">TrackAlign will open Spotify for authorization, then load the ordered collection using your access.</p>{sourceError && <p className="source-error" role="alert">{sourceError}</p>}<button className="primary-button" onClick={loadSpotifyCollection} disabled={sourceLoading}><ListMusic size={16} />{sourceLoading ? 'Connecting...' : 'Sign in and load collection'}</button></div>}
+    {collection && <div className="collection-preview"><div className="preview-heading"><div><span className="eyebrow">Spotify collection</span><h2>{collection.name}</h2></div><span className="status-pill"><span className="status-dot" />{collection.tracks.length} tracks</span></div><div className="collection-track-list">{collection.tracks.map((track) => <div className="collection-track" key={track.position}><span className="track-position">{String(track.position).padStart(2, '0')}</span><div><strong>{track.title}</strong><span>{track.artist}</span></div><span className="track-duration">{track.duration}</span></div>)}</div></div>}
+    {inventory && collection && <div className="review-preview"><div className="preview-heading"><div><span className="eyebrow">Alignment review</span><h2>Proposed matches</h2></div><span className="status-pill"><span className="status-dot" />{proposals.filter((proposal) => proposal.status === 'matched').length} confident</span></div><div className="review-table"><div className="review-header"><span>Local file</span><span>Spotify match</span><span>Confidence</span><span>Status</span></div>{proposals.map((proposal) => <div className="review-row" key={proposal.filePath}><span className="review-file">{proposal.fileName}</span><span>{proposal.trackPosition ? `${String(proposal.trackPosition).padStart(2, '0')} · ${proposal.trackArtist} — ${proposal.trackTitle}` : 'No match found'}</span><span>{Math.round(proposal.score * 100)}% {proposal.evidence.length ? `· ${proposal.evidence.join(', ')}` : ''}</span><span className={`match-status ${proposal.status}`}>{proposal.status}</span></div>)}</div></div>}
     <div className="workspace-preview"><div className="preview-heading"><div><span className="eyebrow">Local inventory</span><h2>{inventory?.folderPath ?? 'Your alignment will appear here'}</h2></div><span className="status-pill"><span className="status-dot" />{inventory ? `${selectedPaths.size} of ${inventory.files?.length ?? 0} selected` : 'Waiting'}</span></div>{inventory ? <div className="inventory-table"><div className="inventory-summary"><span>{inventory.ignoredSymlinkCount ? `${inventory.ignoredSymlinkCount} symbolic link${inventory.ignoredSymlinkCount === 1 ? '' : 's'} ignored.` : 'No symbolic links found.'}</span><span className="selection-actions"><button onClick={() => setAllSelected(true)}>Select all</button><button onClick={() => setAllSelected(false)}>Select none</button></span></div>{inventory.files?.length ? inventory.files.map((file) => <div className={`inventory-row ${file.hidden ? 'hidden-file' : ''} ${file.readOnly ? 'read-only' : ''}`} key={file.path}><label className="file-select"><input type="checkbox" checked={selectedPaths.has(file.path)} onChange={() => toggleFile(file.path)} aria-label={`Select ${file.name}`} /></label><div className="file-name"><FileMusic size={16} /><span>{file.name}</span></div><span>{file.metadata.artist || 'Unknown artist'}</span><span>{file.metadata.title || 'Metadata unavailable'}</span>{file.readOnly && <span className="file-warning">Read-only</span>}{file.hidden && <span className="file-warning">Hidden</span>}</div>) : <div className="empty-state compact"><div className="empty-icon"><FileMusic size={25} /></div><p>No supported audio files found.</p><span>TrackAlign supports MP3, FLAC, OGG, and M4A.</span></div>}</div> : <div className="empty-state"><div className="empty-icon"><FileMusic size={25} /></div><p>Select a folder to begin building your review table.</p><span>Current filenames and expected Spotify filenames will sit side by side.</span></div>}</div>
   </section>
 }

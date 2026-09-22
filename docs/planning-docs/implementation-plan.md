@@ -24,9 +24,10 @@
 
 - Register OAuth configuration and callback flow.
 - Implement Authorization Code with PKCE; read development client ID and redirect URI from Git-excluded local configuration, and package the public client ID with registered platform-specific redirect URIs without shipping a client secret.
-- Store tokens securely and refresh them as needed.
+- Load Git-excluded local configuration with `dotenv` during development.
+- Store tokens in the main process and refresh access tokens as needed.
 - Parse playlist and album URLs.
-- Fetch ordered tracks, including private collections when authorized.
+- Fetch ordered playlist and album tracks through the Spotify API bridge, including private collections when authorized.
 - Request and explain the required playlist-read scopes, including private and collaborative access where applicable.
 - Preserve playlist positions, album track order, and duplicate playlist occurrences.
 - Add clear handling for expired authorization, unavailable collections, rate limits, and network failures.

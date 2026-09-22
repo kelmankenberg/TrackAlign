@@ -29,6 +29,10 @@ interface Window {
 	trackAlign: {
 		appName: string
 		inspectFolder: () => Promise<FolderInventory>
+		spotify: {
+			authenticate: () => Promise<{ authenticated: true }>
+			loadCollection: (sourceUrl: string) => Promise<{ type: 'playlist' | 'album'; name: string; url: string; tracks: Array<{ position: number; artist: string; title: string; duration: string; durationMs?: number }> }>
+		}
 		window: {
 			minimize: () => void
 			toggleMaximize: () => void

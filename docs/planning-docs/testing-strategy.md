@@ -26,6 +26,7 @@ Cover pure logic with table-driven fixtures:
 - metadata extraction from representative MP3, FLAC, OGG, and M4A fixtures;
 - Spotify client behavior using mocked responses, including private-playlist authorization, pagination, rate limits, and expired tokens;
 - PKCE callback handling, required scopes, token refresh, sign-out, and redacted logging;
+- Spotify URL parsing and ordered playlist/album response normalization;
 - IPC validation between renderer and main process;
 - operation manifest creation and guarded undo.
 - retained rename history and guarded undo of an older eligible operation.
