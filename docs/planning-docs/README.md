@@ -25,6 +25,7 @@ TrackAlign is a desktop application that matches selected local audio files to a
 - Recovery: retain history for multiple undoable rename operations.
 - Ordering: playlists use playlist position, albums use album track order, and excluded/unmatched positions leave numbering gaps.
 - Preferences: provide a Settings page for user-configurable app behavior.
+- Appearance: provide persisted light and dark modes, accessible from Settings and the More menu.
 
 ## Document Map
 

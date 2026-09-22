@@ -8,6 +8,7 @@
 - Build the persistent shell: custom top toolbar, Lucide left navigation rail, page outlet, right-side Help panel, and status bar.
 - Implement the three-state navigation layout: 240-280px expanded rail, icon-only rail, and toolbar navigation after the title, with a far-left cycle button.
 - Persist the selected navigation layout between launches and add the More menu, Changelog panel, and version information.
+- Add persisted light/dark theme state with controls in Settings and the More menu.
 - Add visual inventory states for hidden audio files and read-only or otherwise unrenameable files; hide unsupported non-audio files.
 - Define renderer state boundaries so navigation and Help do not discard in-progress work.
 - Ignore symbolic links during folder inventory and report their count in the inventory summary.

@@ -10,6 +10,7 @@ import {
   ListMusic,
   Menu,
   Minus,
+  Moon,
   MoreHorizontal,
   PanelLeft,
   PlayCircle,
@@ -18,12 +19,14 @@ import {
   Square,
   SlidersHorizontal,
   Sparkles,
+  Sun,
   X,
 } from 'lucide-react'
 
 type NavMode = 'expanded' | 'iconOnly' | 'toolbar'
 type Page = 'workspace' | 'settings'
 type SidePanel = 'help' | 'changelog' | null
+type Theme = 'light' | 'dark'
 
 const navItems: Array<{ id: Page; label: string; icon: typeof LayoutDashboard }> = [
   { id: 'workspace', label: 'Workspace', icon: LayoutDashboard },
@@ -37,6 +40,7 @@ const changelog = [
 
 function App() {
   const [navMode, setNavMode] = useState<NavMode>(() => (localStorage.getItem('trackalign-nav-mode') as NavMode) || 'expanded')
+  const [theme, setTheme] = useState<Theme>(() => localStorage.getItem('trackalign-theme') === 'dark' ? 'dark' : 'light')
   const [page, setPage] = useState<Page>('workspace')
   const [panel, setPanel] = useState<SidePanel>(null)
   const [moreOpen, setMoreOpen] = useState(false)
@@ -47,6 +51,11 @@ function App() {
     const nextMode: NavMode = navMode === 'expanded' ? 'iconOnly' : navMode === 'iconOnly' ? 'toolbar' : 'expanded'
     setNavMode(nextMode)
     localStorage.setItem('trackalign-nav-mode', nextMode)
+  }
+
+  const setAppTheme = (nextTheme: Theme) => {
+    setTheme(nextTheme)
+    localStorage.setItem('trackalign-theme', nextTheme)
   }
 
   const renderNavItems = (showLabels: boolean) => navItems.map(({ id, label, icon: Icon }) => (
@@ -63,7 +72,7 @@ function App() {
   ))
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-theme={theme}>
       <header className="topbar">
         <button className="toolbar-icon" onClick={cycleNavMode} title="Change navigation layout" aria-label="Change navigation layout">
           <PanelLeft size={19} />
@@ -84,6 +93,7 @@ function App() {
         {moreOpen && <div className="more-menu">
           <button onClick={() => window.location.reload()}><RotateCcw size={16} />Restart TrackAlign</button>
           <button onClick={() => { setPanel('changelog'); setMoreOpen(false) }}><History size={16} />Changelog</button>
+          <button onClick={() => setAppTheme(theme === 'light' ? 'dark' : 'light')}>{theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}Use {theme === 'light' ? 'dark' : 'light'} mode</button>
           <div className="menu-version">TrackAlign 0.1.0</div>
         </div>}
       </header>
@@ -91,7 +101,7 @@ function App() {
       <div className="app-body">
         {navMode !== 'toolbar' && <aside className={`nav-rail ${navMode === 'iconOnly' ? 'icon-only' : ''}`} aria-label="Primary navigation">{renderNavItems(navMode === 'expanded')}</aside>}
         <main className="page-content">
-          {page === 'workspace' ? <Workspace onHelp={() => setPanel('help')} onStatusChange={setStatus} /> : <SettingsPage onHelp={() => setPanel('help')} />}
+          {page === 'workspace' ? <Workspace onHelp={() => setPanel('help')} onStatusChange={setStatus} /> : <SettingsPage onHelp={() => setPanel('help')} theme={theme} onThemeChange={setAppTheme} />}
         </main>
         {panel && <aside className="side-panel" aria-label={panel === 'help' ? 'Contextual help' : 'Changelog'}>
           <div className="panel-header">
@@ -154,10 +164,10 @@ function Workspace({ onHelp, onStatusChange }: { onHelp: () => void; onStatusCha
   </section>
 }
 
-function SettingsPage({ onHelp }: { onHelp: () => void }) {
+function SettingsPage({ onHelp, theme, onThemeChange }: { onHelp: () => void; theme: Theme; onThemeChange: (theme: Theme) => void }) {
   return <section className="settings-page">
     <div className="page-heading"><div><span className="eyebrow">Preferences</span><h1>Settings</h1><p>Make TrackAlign fit the way you organize music.</p></div><button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button></div>
-    <div className="settings-list"><div className="setting-row"><div className="setting-icon"><SlidersHorizontal size={18} /></div><div><h2>Rename template</h2><p>Choose the fields that shape expected filenames.</p></div><button className="ghost-button">Configure <ChevronDown size={15} /></button></div><div className="setting-row"><div className="setting-icon"><Menu size={18} /></div><div><h2>Navigation layout</h2><p>Your preferred rail state is remembered between launches.</p></div><span className="setting-value">Automatic</span></div><div className="setting-row"><div className="setting-icon"><PlayCircle size={18} /></div><div><h2>Startup behavior</h2><p>Start with a clean workspace after restarting TrackAlign.</p></div><span className="setting-value">Clean start</span></div></div>
+    <div className="settings-list"><div className="setting-row"><div className="setting-icon"><SlidersHorizontal size={18} /></div><div><h2>Rename template</h2><p>Choose the fields that shape expected filenames.</p></div><button className="ghost-button">Configure <ChevronDown size={15} /></button></div><div className="setting-row"><div className="setting-icon"><Menu size={18} /></div><div><h2>Navigation layout</h2><p>Your preferred rail state is remembered between launches.</p></div><span className="setting-value">Automatic</span></div><div className="setting-row"><div className="setting-icon">{theme === 'light' ? <Sun size={18} /> : <Moon size={18} />}</div><div><h2>Appearance</h2><p>Choose a light or dark workspace for your preference.</p></div><div className="theme-toggle" role="group" aria-label="Appearance"><button className={theme === 'light' ? 'selected' : ''} onClick={() => onThemeChange('light')}><Sun size={14} />Light</button><button className={theme === 'dark' ? 'selected' : ''} onClick={() => onThemeChange('dark')}><Moon size={14} />Dark</button></div></div><div className="setting-row"><div className="setting-icon"><PlayCircle size={18} /></div><div><h2>Startup behavior</h2><p>Start with a clean workspace after restarting TrackAlign.</p></div><span className="setting-value">Clean start</span></div></div>
   </section>
 }
 

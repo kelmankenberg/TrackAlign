@@ -49,6 +49,7 @@ Request the smallest scopes needed for the workflow, including private playlist 
 - `RenameOperation`: timestamp, completed items, original paths, new paths, and undo eligibility.
 - `RenameHistory`: retained rename operations and their guarded undo state.
 - `AppPreferences`: persisted user settings such as the default rename template and other supported preferences.
+- `AppPreferences`: persisted user settings including `theme` (`light` or `dark`), default rename template, navigation layout, and other supported preferences.
 - `UiStatus`: current operation, progress, warnings, errors, and undo availability for the status bar.
 
 ## Data Flow

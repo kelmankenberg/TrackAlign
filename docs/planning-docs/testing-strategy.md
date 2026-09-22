@@ -54,6 +54,7 @@ Verify the persistent shell and direct-manipulation behavior:
 - the selected page and in-progress workspace state survive every navigation layout transition;
 - navigation preserves in-progress workspace state;
 - Settings loads, persists, and resets supported preferences;
+- Settings and More menu can switch between light and dark mode, and the selected theme persists after restart;
 - every page exposes Help and the context-sensitive panel slides in from the right and closes without losing work;
 - the status bar reports selection, loading, progress, warning, completion, and undo states;
 - keyboard focus reaches toolbar, navigation, Help, and Help-panel controls.

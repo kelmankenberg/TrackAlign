@@ -16,6 +16,7 @@ People who download music with SpotDL or similar tools and need local filenames 
 - A collapsible left navigation rail containing icon buttons for all primary pages and actions, using the Lucide icon library. The expanded rail is 240-280px wide.
 - A far-left top-toolbar collapse button, before the app title, that cycles navigation through expanded rail, icon-only rail, and toolbar-navigation modes. In toolbar-navigation mode, all navigation icons appear in a button group immediately after the title; another toggle restores the expanded rail.
 - A Settings page for user preferences.
+- Light and dark appearance modes with typical accessible color schemes, persisted between launches and available from Settings and the More menu.
 - A context-sensitive Help button on every page that opens a right-side slide-out Help panel.
 - A More menu containing Restart TrackAlign, Changelog, and version information. Changelog opens a structured collapsible panel with only the latest version expanded by default.
 - A status bar for current operation, selection, loading, warning, and completion information.
@@ -60,7 +61,7 @@ The left rail provides icon buttons for all primary pages. Each icon has an acce
 
 ### FR-0.2: Configure Preferences
 
-The Settings page allows users to customize supported preferences, including the rename template and other app behavior selected during implementation. Settings must be persisted locally and have clear defaults and reset behavior.
+The Settings page allows users to customize supported preferences, including the rename template, appearance mode, and other app behavior selected during implementation. Settings must be persisted locally and have clear defaults and reset behavior.
 
 ### FR-0.3: Provide Contextual Help
 
@@ -71,6 +72,8 @@ Help is static documentation in the initial release. The Help and Changelog pane
 ### FR-0.3.1: Provide Global App Menu
 
 The More menu provides Restart TrackAlign, Changelog, and version information. Changelog opens in a structured panel using collapsible version sections, with only the latest version expanded by default. Changelog expansion state does not need to persist.
+
+The More menu also provides a light/dark mode toggle. Changing appearance applies immediately and uses the same persisted preference as Settings.
 
 ### FR-0.4: Display Status
 
