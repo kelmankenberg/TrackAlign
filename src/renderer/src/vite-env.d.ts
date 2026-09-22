@@ -29,5 +29,10 @@ interface Window {
 	trackAlign: {
 		appName: string
 		inspectFolder: () => Promise<FolderInventory>
+		window: {
+			minimize: () => void
+			toggleMaximize: () => void
+			close: () => void
+		}
 	}
 }

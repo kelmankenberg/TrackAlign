@@ -9,11 +9,13 @@ import {
   LayoutDashboard,
   ListMusic,
   Menu,
+  Minus,
   MoreHorizontal,
   PanelLeft,
   PlayCircle,
   RotateCcw,
   Settings,
+  Square,
   SlidersHorizontal,
   Sparkles,
   X,
@@ -74,6 +76,11 @@ function App() {
         <div className="toolbar-spacer" />
         <button className="toolbar-action" onClick={() => setPanel('help')} title="Open contextual help" aria-label="Open contextual help"><CircleHelp size={18} /></button>
         <button className="toolbar-action" onClick={() => setMoreOpen((open) => !open)} title="More options" aria-label="More options"><MoreHorizontal size={19} /></button>
+        <div className="window-controls" aria-label="Window controls">
+          <button className="window-control" onClick={() => window.trackAlign.window.minimize()} title="Minimize" aria-label="Minimize"><Minus size={15} /></button>
+          <button className="window-control" onClick={() => window.trackAlign.window.toggleMaximize()} title="Maximize or restore" aria-label="Maximize or restore"><Square size={13} /></button>
+          <button className="window-control close-control" onClick={() => window.trackAlign.window.close()} title="Close" aria-label="Close"><X size={15} /></button>
+        </div>
         {moreOpen && <div className="more-menu">
           <button onClick={() => window.location.reload()}><RotateCcw size={16} />Restart TrackAlign</button>
           <button onClick={() => { setPanel('changelog'); setMoreOpen(false) }}><History size={16} />Changelog</button>

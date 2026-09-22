@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu } from 'electron'
 import { access, readdir } from 'node:fs/promises'
 import { constants } from 'node:fs'
 import { join } from 'node:path'
@@ -63,6 +63,7 @@ async function inspectFolder() {
 
 function createWindow() {
   const window = new BrowserWindow({
+    frame: false,
     width: 1440,
     height: 900,
     minWidth: 980,
@@ -83,7 +84,15 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  Menu.setApplicationMenu(null)
   ipcMain.handle('folder:inspect', inspectFolder)
+  ipcMain.on('window:minimize', (event) => BrowserWindow.fromWebContents(event.sender)?.minimize())
+  ipcMain.on('window:toggle-maximize', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (window?.isMaximized()) window.unmaximize()
+    else window?.maximize()
+  })
+  ipcMain.on('window:close', (event) => BrowserWindow.fromWebContents(event.sender)?.close())
   createWindow()
 
   app.on('activate', () => {

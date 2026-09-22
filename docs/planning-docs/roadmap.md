@@ -15,6 +15,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 - [x] Build the formless workspace shell with mocked workspace data.
   - [x] Custom top toolbar with TrackAlign title and global controls.
+  - [x] Frameless Electron window with custom minimize, maximize, and close controls.
   - [x] Three-state navigation cycle: expanded rail, icon-only rail, toolbar navigation.
   - [x] Persist navigation layout state between launches.
   - [x] Lucide icon buttons with accessible names and tooltips.
