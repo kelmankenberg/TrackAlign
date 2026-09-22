@@ -5,6 +5,8 @@
 - Initialize Electron, React, TypeScript, packaging, linting, and test tooling.
 - Establish main/preload/renderer boundaries and typed IPC contracts.
 - Add platform-aware path and filename utilities.
+- Build the persistent shell: custom top toolbar, Lucide left navigation rail, page outlet, right-side Help panel, and status bar.
+- Define renderer state boundaries so navigation and Help do not discard in-progress work.
 
 ## Phase 1: Local Folder Inventory
 
@@ -30,6 +32,7 @@
 
 ## Phase 4: Review Experience
 
+- Implement the formless workspace interaction model rather than a rigid wizard-only flow.
 - Build the current-filename/expected-filename comparison table.
 - Add selection, exclusion, manual match changes, and unmatched states.
 - Add template tokens, sanitization, and live previews.
@@ -44,6 +47,7 @@
 
 ## Phase 6: Packaging and Release Hardening
 
+- Verify toolbar, navigation, Settings, contextual Help, and status bar behavior at supported window sizes.
 - Add Linux and Windows packaging.
 - Test OAuth callback behavior in packaged builds.
 - Run accessibility, filesystem, and failure-path checks.

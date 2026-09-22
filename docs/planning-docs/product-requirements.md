@@ -11,6 +11,12 @@ People who download music with SpotDL or similar tools and need local filenames 
 ## In Scope
 
 - Linux and Windows desktop builds.
+- A formless desktop workspace organized around persistent navigation and direct manipulation rather than a traditional wizard or form sequence.
+- A custom top toolbar containing the TrackAlign title and app control buttons.
+- A left navigation rail containing icon buttons for all primary pages and actions, using the Lucide icon library.
+- A Settings page for user preferences.
+- A context-sensitive Help button on every page that opens a right-side slide-out Help panel.
+- A status bar for current operation, selection, loading, warning, and completion information.
 - Folder selection and display of audio files supported by the application: MP3, FLAC, OGG, and M4A.
 - Per-file selection, including Select All and Select None.
 - Spotify OAuth login and authorization-aware access to public and private playlists.
@@ -33,6 +39,28 @@ People who download music with SpotDL or similar tools and need local filenames 
 - Batch processing of multiple folders in one operation.
 
 ## Functional Requirements
+
+### FR-0: Provide the Application Shell
+
+The application presents a persistent shell with a custom top toolbar, left navigation rail, page content area, contextual Help panel, and status bar. Page transitions must preserve relevant in-progress work unless the user explicitly discards it.
+
+The primary workflow should feel like a direct-manipulation workspace: users can inspect, select, compare, and adjust files from the relevant page without being forced through a rigid wizard sequence.
+
+### FR-0.1: Navigate Primary Pages
+
+The left rail provides icon buttons for all primary pages. Each icon has an accessible name and tooltip. The initial page set includes the workspace/review page, Settings, and any additional pages needed by the implementation. The active page is visually clear.
+
+### FR-0.2: Configure Preferences
+
+The Settings page allows users to customize supported preferences, including the rename template and other app behavior selected during implementation. Settings must be persisted locally and have clear defaults and reset behavior.
+
+### FR-0.3: Provide Contextual Help
+
+Every page includes a Help icon button. Selecting it opens a right-side slide-out panel containing help relevant to the current page and state. The panel can be closed without losing work and must not obscure essential controls without an available way to dismiss or resize it.
+
+### FR-0.4: Display Status
+
+The status bar displays specific current information such as selected folder, file counts, Spotify collection state, matching progress, warnings, rename results, and undo availability. Status updates must distinguish normal information, warnings, errors, and in-progress work.
 
 ### FR-1: Load Local Files
 

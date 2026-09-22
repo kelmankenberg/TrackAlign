@@ -7,11 +7,16 @@ TrackAlign is a desktop application that matches selected local audio files to a
 - MVP platforms: Linux and Windows; macOS is planned for a later release.
 - Desktop shell: Electron.
 - Renderer: React.
+- Interaction model: a formless, direct-manipulation workspace rather than a traditional multi-step form flow.
+- App shell: custom top toolbar with the app title and control buttons, plus an icon-based left navigation rail.
+- Help: every page exposes a Help button that opens context-sensitive help in a right-side slide-out panel.
+- Status: a persistent status bar displays relevant operational information.
 - Spotify access: OAuth, including private playlists when authorization permits.
 - Input: select any number of files from a loaded folder, with Select All and Select None controls.
 - Matching: use audio metadata first, with filenames as a fallback; every result appears in review.
 - Rename output: user-customizable metadata tokens, with collision suffixes.
 - Recovery: provide undo support.
+- Preferences: provide a Settings page for user-configurable app behavior.
 
 ## Document Map
 

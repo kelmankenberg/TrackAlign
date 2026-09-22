@@ -3,8 +3,20 @@
 ## Proposed Structure
 
 - **Electron main process**: window lifecycle, secure IPC handlers, OAuth callback coordination, Spotify API calls, filesystem access, metadata extraction, matching orchestration, rename execution, and operation manifests.
-- **React renderer**: navigation and stateful workflow for folder selection, Spotify source loading, review, template editing, confirmation, completion, and undo.
+- **React renderer**: the persistent app shell and stateful workspace for folder selection, Spotify source loading, review, template editing, confirmation, completion, undo, Settings, contextual Help, and status reporting.
 - **Shared domain layer**: typed models and pure functions for collection tracks, local files, match candidates, rename plans, template rendering, sanitization, and validation.
+
+## Renderer Shell
+
+The renderer should implement a persistent shell with:
+
+- a custom top toolbar containing the app title and global control buttons;
+- a left navigation rail with Lucide icon buttons and accessible labels;
+- a page outlet for the workspace and Settings pages;
+- a right-side Help panel that can slide in with page/state-specific content;
+- a persistent status bar driven by application state.
+
+Keep the workflow state separate from page presentation so navigating to Settings or opening Help does not discard an in-progress matching or rename plan. The shell should support direct manipulation and conditional controls instead of requiring a rigid wizard state machine.
 
 ## Security Boundaries
 
@@ -26,6 +38,8 @@ Validate paths and plans in the main process even when the renderer already vali
 - `MatchProposal`: local file ID, collection track ID, confidence score, evidence, source (`automatic` or `manual`), and status.
 - `RenamePlanItem`: source path, target filename/path, match reference, included flag, and validation warnings.
 - `RenameOperation`: timestamp, completed items, original paths, new paths, and undo eligibility.
+- `AppPreferences`: persisted user settings such as the default rename template and other supported preferences.
+- `UiStatus`: current operation, progress, warnings, errors, and undo availability for the status bar.
 
 ## Data Flow
 

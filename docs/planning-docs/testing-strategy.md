@@ -37,6 +37,16 @@ Use temporary directories to verify:
 
 ## UI Tests
 
+Verify the persistent shell and direct-manipulation behavior:
+
+- the custom top toolbar renders the TrackAlign title and app control buttons;
+- the left navigation rail exposes all primary pages with Lucide icons, accessible names, active state, and tooltips;
+- navigation preserves in-progress workspace state;
+- Settings loads, persists, and resets supported preferences;
+- every page exposes Help and the context-sensitive panel slides in from the right and closes without losing work;
+- the status bar reports selection, loading, progress, warning, completion, and undo states;
+- keyboard focus reaches toolbar, navigation, Help, and Help-panel controls.
+
 Verify the primary flow and important states:
 
 - folder selection and Select All/None;
