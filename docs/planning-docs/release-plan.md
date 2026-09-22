@@ -4,6 +4,7 @@
 
 - Linux and Windows packages install and launch successfully.
 - Spotify OAuth works in development and packaged builds.
+- Packaged builds use PKCE and do not expose a Spotify client secret; redirect URI registration is verified for Linux and Windows.
 - Authorized users can load public collections and private collections available to their account.
 - Supported local formats can be inventoried and matched with filename fallback.
 - The review table shows every proposed match and expected filename.
@@ -29,6 +30,8 @@
 - Logs must redact access tokens and avoid unnecessary personal filenames.
 - Rate limits and network outages need user-visible recovery guidance.
 - Packaging must document required permissions for reading and renaming local files.
+- Spotify setup documentation must distinguish developer app configuration from user authorization. Users authorize through Spotify and should never provide a password or client secret to TrackAlign.
+- OAuth scopes, token refresh, sign-out, and unavailable/private collection errors must be tested without exposing tokens in logs.
 - The app should make clear that it organizes files and does not download or distribute music.
 
 ## Success Signals

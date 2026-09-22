@@ -22,6 +22,8 @@ People who download music with SpotDL or similar tools and need local filenames 
 - Folder selection and display of audio files supported by the application: MP3, FLAC, OGG, and M4A.
 - Per-file selection, including Select All and Select None.
 - Spotify OAuth login and authorization-aware access to public and private playlists.
+- OAuth uses PKCE. Users authorize TrackAlign through Spotify and never enter a Spotify password or client secret into the app.
+- The app requests only the scopes needed for the selected workflow, including private and collaborative playlist-read access when required.
 - Loading a Spotify playlist or album by URL.
 - Reading title, artist, album, year, track number, and duration where available.
 - Matching selected local files to Spotify tracks using metadata and filename fallback.
@@ -32,6 +34,7 @@ People who download music with SpotDL or similar tools and need local filenames 
 - Undo history for multiple completed rename operations.
 - Hidden audio files shown with distinct visual treatment; unsupported non-audio files hidden from the inventory.
 - Visible read-only or otherwise unrenameable file warnings when a folder is loaded.
+- Symbolic links are ignored and reported in the folder inventory summary.
 
 ## Out of Scope for MVP
 
@@ -79,7 +82,7 @@ The user can choose a folder and see supported audio files with their current fi
 
 ### FR-2: Load Spotify Collection
 
-The user can authenticate with Spotify, enter a playlist or album URL, and load the ordered track list. The application must explain authorization failures and unavailable collections.
+The user can authenticate with Spotify, enter a playlist or album URL, and load the ordered track list. OAuth is also used for public collection access where the API requires an access token, not only for private playlists. The application must explain authorization failures, missing scopes, expired sessions, rate limits, and unavailable collections. Spotify client secrets and user passwords must never be requested or stored by the renderer.
 
 ### FR-3: Generate Matches
 

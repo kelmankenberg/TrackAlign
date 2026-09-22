@@ -34,6 +34,12 @@ The renderer must not receive unrestricted filesystem or Node.js access. Use a p
 
 Validate paths and plans in the main process even when the renderer already validated them. OAuth tokens should remain in the main process or an encrypted platform-appropriate store and should not be persisted in renderer state or logs.
 
+## Spotify OAuth
+
+The application uses Authorization Code with PKCE for the desktop flow. The Spotify client ID and registered redirect URI are application configuration, not user credentials. The client secret must not be shipped in the renderer or treated as a secret on a desktop client. The user authorizes TrackAlign in Spotify and returns to the app through the registered callback.
+
+Request the smallest scopes needed for the workflow, including private playlist and collaborative playlist read scopes when applicable. Public playlist and album access may still require an access token depending on the endpoint, so authentication should not be presented as a private-playlist-only feature. Keep access and refresh tokens out of logs and renderer state, refresh expired access tokens in the main process, and provide a clear sign-out/revoke path.
+
 ## Core Domain Models
 
 - `LocalAudioFile`: absolute path, original filename, extension, parsed metadata, selection state.

@@ -21,11 +21,10 @@ This document contains active decisions that still need confirmation. Resolved d
 - Contextual Help is static in the initial release; dynamic actions are a later consideration.
 - The status bar may persistently show the selected folder path and Spotify collection name.
 - The left rail is not resizable. Help and Changelog panels may be resized up to 40% of the app window width.
+- Symbolic links are ignored by default and reported in the folder inventory summary.
+- Spotify access uses OAuth with PKCE. Users authorize TrackAlign in Spotify; they do not provide their Spotify password or developer secret to the app.
 
 ## Remaining Decisions
 
-1. **Spotify app credentials:** How should the Spotify client ID and redirect URI be configured for development and packaged releases?
-   - Answer: currently unknown
-
-2. **Symbolic links:** Should symbolic links be ignored, included, or reported separately?
+1. **Spotify app configuration:** What packaging and deployment mechanism should supply the registered Spotify client ID and redirect URI for development and Linux/Windows releases?
    - Answer:

@@ -21,9 +21,11 @@ Cover pure logic with table-driven fixtures:
 ## Integration Tests
 
 - folder inventory with supported and unsupported extensions;
+- symbolic links are ignored and reported in the inventory summary;
 - hidden audio files and visible read-only/unrenameable conditions;
 - metadata extraction from representative MP3, FLAC, OGG, and M4A fixtures;
 - Spotify client behavior using mocked responses, including private-playlist authorization, pagination, rate limits, and expired tokens;
+- PKCE callback handling, required scopes, token refresh, sign-out, and redacted logging;
 - IPC validation between renderer and main process;
 - operation manifest creation and guarded undo.
 - retained rename history and guarded undo of an older eligible operation.

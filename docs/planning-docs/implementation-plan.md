@@ -10,6 +10,7 @@
 - Persist the selected navigation layout between launches and add the More menu, Changelog panel, and version information.
 - Add visual inventory states for hidden audio files and read-only or otherwise unrenameable files; hide unsupported non-audio files.
 - Define renderer state boundaries so navigation and Help do not discard in-progress work.
+- Ignore symbolic links during folder inventory and report their count in the inventory summary.
 
 ## Phase 1: Local Folder Inventory
 
@@ -21,9 +22,11 @@
 ## Phase 2: Spotify Integration
 
 - Register OAuth configuration and callback flow.
+- Implement Authorization Code with PKCE; configure client ID and registered redirect URI per build environment without shipping a client secret in the renderer.
 - Store tokens securely and refresh them as needed.
 - Parse playlist and album URLs.
 - Fetch ordered tracks, including private collections when authorized.
+- Request and explain the required playlist-read scopes, including private and collaborative access where applicable.
 - Preserve playlist positions, album track order, and duplicate playlist occurrences.
 - Add clear handling for expired authorization, unavailable collections, rate limits, and network failures.
 
