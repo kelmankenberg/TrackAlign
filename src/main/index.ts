@@ -24,10 +24,15 @@ function createCodeChallenge(verifier: string) {
   return createHash('sha256').update(verifier).digest('base64url')
 }
 
-function configuredRedirectUri(port: number) {
+function configuredRedirectUri() {
   const configured = process.env.SPOTIFY_REDIRECT_URI
-  if (configured) return configured.replace('{port}', String(port))
-  return `http://127.0.0.1:${port}/callback`
+  if (configured) return configured.replace('{port}', '43821')
+  return 'http://127.0.0.1:43821/callback'
+}
+
+function configuredRedirectPort() {
+  const redirectUri = configuredRedirectUri()
+  return Number(new URL(redirectUri).port) || 43821
 }
 
 async function exchangeSpotifyCode(code: string, verifier: string, redirectUri: string) {
@@ -89,14 +94,8 @@ async function startSpotifyAuth() {
     })
 
     server.on('error', reject)
-    server.listen(0, '127.0.0.1', async () => {
-      const address = server.address()
-      if (!address || typeof address === 'string') {
-        server.close()
-        reject(new Error('Could not create a local Spotify callback.'))
-        return
-      }
-      const redirectUri = configuredRedirectUri(address.port)
+    redirectUri = configuredRedirectUri()
+    server.listen(configuredRedirectPort(), '127.0.0.1', async () => {
       const authUrl = new URL('https://accounts.spotify.com/authorize')
       authUrl.search = new URLSearchParams({
         client_id: clientId,
