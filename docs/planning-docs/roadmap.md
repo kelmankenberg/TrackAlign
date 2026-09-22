@@ -70,7 +70,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 ## Quality and Release
 
-- [ ] Add unit tests for matching, templates, sanitization, ordering, and collisions.
+- [-] Add unit tests for matching, templates, sanitization, ordering, and collisions.
 - [ ] Add integration tests for metadata, OAuth, IPC, filesystem safety, and undo history.
 - [ ] Add UI and accessibility tests for the shell and primary workflow.
 - [ ] Run packaged smoke tests on Linux and Windows.
@@ -85,3 +85,4 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 ## Open Blockers
 
 - Local Spotify credentials are required to exercise OAuth: copy `.env.example` to `.env` and provide `SPOTIFY_CLIENT_ID` plus a registered redirect URI. No client secret is needed.
+- Shared matching and filename unit tests are passing with `npm test`.
