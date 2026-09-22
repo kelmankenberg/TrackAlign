@@ -147,16 +147,24 @@ function parseSpotifySource(sourceUrl: string) {
 async function loadSpotifyCollection(sourceUrl: string) {
   const source = parseSpotifySource(sourceUrl)
   const accessToken = await getSpotifyAccessToken()
-  const endpoint = source.type === 'playlist' ? `${spotifyApiBase}/playlists/${source.id}/tracks?limit=50` : `${spotifyApiBase}/albums/${source.id}/tracks?limit=50`
-  const response = await fetch(endpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
-  if (!response.ok) throw new Error(`Spotify could not load this ${source.type} (${response.status}). Check access and the URL.`)
-  const payload = await response.json() as { items: Array<{ track?: { name: string; duration_ms: number; artists: Array<{ name: string }> } }>; next?: string | null }
-  const tracks = payload.items.filter((item) => item.track).map((item, index) => ({
+  type SpotifyTrack = { name: string; duration_ms: number; artists: Array<{ name: string }> }
+  let endpoint: string | null = source.type === 'playlist' ? `${spotifyApiBase}/playlists/${source.id}/tracks?limit=50` : `${spotifyApiBase}/albums/${source.id}/tracks?limit=50`
+  const sourceTracks: SpotifyTrack[] = []
+
+  while (endpoint) {
+    const response = await fetch(endpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
+    if (!response.ok) throw new Error(`Spotify could not load this ${source.type} (${response.status}). Check access and the URL.`)
+    const payload = await response.json() as { items: Array<{ track?: SpotifyTrack } & SpotifyTrack>; next?: string | null }
+    sourceTracks.push(...payload.items.map((item) => source.type === 'playlist' ? item.track : item).filter((track): track is SpotifyTrack => Boolean(track)))
+    endpoint = payload.next ?? null
+  }
+
+  const tracks = sourceTracks.map((track, index) => ({
     position: index + 1,
-    artist: item.track!.artists.map((artist) => artist.name).join(', '),
-    title: item.track!.name,
-    duration: `${Math.floor(item.track!.duration_ms / 60000)}:${String(Math.floor(item.track!.duration_ms / 1000) % 60).padStart(2, '0')}`,
-    durationMs: item.track!.duration_ms,
+    artist: track.artists.map((artist) => artist.name).join(', '),
+    title: track.name,
+    duration: `${Math.floor(track.duration_ms / 60000)}:${String(Math.floor(track.duration_ms / 1000) % 60).padStart(2, '0')}`,
+    durationMs: track.duration_ms,
   }))
   return { type: source.type, name: source.type === 'playlist' ? 'Spotify playlist' : 'Spotify album', url: sourceUrl, tracks }
 }
