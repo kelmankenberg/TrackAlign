@@ -5,6 +5,7 @@
 - Linux and Windows packages install and launch successfully.
 - Spotify OAuth works in development and packaged builds.
 - Packaged builds use PKCE and do not expose a Spotify client secret; redirect URI registration is verified for Linux and Windows.
+- Development credentials use Git-excluded local configuration; packaged builds include only the public client ID and registered platform-specific redirect URIs.
 - Authorized users can load public collections and private collections available to their account.
 - Supported local formats can be inventoried and matched with filename fallback.
 - The review table shows every proposed match and expected filename.

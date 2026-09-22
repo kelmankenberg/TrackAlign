@@ -16,6 +16,7 @@ TrackAlign is a desktop application that matches selected local audio files to a
 - Status: a persistent status bar displays relevant operational information.
 - Spotify access: OAuth, including private playlists when authorization permits.
 - Spotify desktop authentication: Authorization Code with PKCE; users authorize in Spotify and never provide a password or client secret to TrackAlign.
+- Spotify configuration: development uses Git-excluded local environment/configuration; packaged builds include the public client ID and registered platform-specific redirect URIs.
 - Filesystem safety: symbolic links are ignored and reported in the inventory summary.
 - Input: select any number of files from a loaded folder, with Select All and Select None controls.
 - Matching: use audio metadata first, with filenames as a fallback; every result appears in review.

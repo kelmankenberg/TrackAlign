@@ -22,7 +22,7 @@
 ## Phase 2: Spotify Integration
 
 - Register OAuth configuration and callback flow.
-- Implement Authorization Code with PKCE; configure client ID and registered redirect URI per build environment without shipping a client secret in the renderer.
+- Implement Authorization Code with PKCE; read development client ID and redirect URI from Git-excluded local configuration, and package the public client ID with registered platform-specific redirect URIs without shipping a client secret.
 - Store tokens securely and refresh them as needed.
 - Parse playlist and album URLs.
 - Fetch ordered tracks, including private collections when authorized.

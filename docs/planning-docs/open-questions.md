@@ -23,8 +23,8 @@ This document contains active decisions that still need confirmation. Resolved d
 - The left rail is not resizable. Help and Changelog panels may be resized up to 40% of the app window width.
 - Symbolic links are ignored by default and reported in the folder inventory summary.
 - Spotify access uses OAuth with PKCE. Users authorize TrackAlign in Spotify; they do not provide their Spotify password or developer secret to the app.
+- Development supplies the Spotify client ID and redirect URI through local environment/configuration excluded from Git. Packaged builds include the public client ID and use registered platform-specific redirect URIs; no client secret is shipped.
 
 ## Remaining Decisions
 
-1. **Spotify app configuration:** What packaging and deployment mechanism should supply the registered Spotify client ID and redirect URI for development and Linux/Windows releases?
-   - Answer:
+There are currently no unresolved planning questions.

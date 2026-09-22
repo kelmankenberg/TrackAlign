@@ -36,7 +36,7 @@ Validate paths and plans in the main process even when the renderer already vali
 
 ## Spotify OAuth
 
-The application uses Authorization Code with PKCE for the desktop flow. The Spotify client ID and registered redirect URI are application configuration, not user credentials. The client secret must not be shipped in the renderer or treated as a secret on a desktop client. The user authorizes TrackAlign in Spotify and returns to the app through the registered callback.
+The application uses Authorization Code with PKCE for the desktop flow. The Spotify client ID and registered redirect URI are application configuration, not user credentials. Development reads them from Git-excluded local environment/configuration. Packaged builds include the public client ID and use registered platform-specific redirect URIs. The client secret must not be shipped in the renderer or treated as a secret on a desktop client. The user authorizes TrackAlign in Spotify and returns to the app through the registered callback.
 
 Request the smallest scopes needed for the workflow, including private playlist and collaborative playlist read scopes when applicable. Public playlist and album access may still require an access token depending on the endpoint, so authentication should not be presented as a private-playlist-only feature. Keep access and refresh tokens out of logs and renderer state, refresh expired access tokens in the main process, and provide a clear sign-out/revoke path.
 
