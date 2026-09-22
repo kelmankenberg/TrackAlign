@@ -9,7 +9,10 @@ Cover pure logic with table-driven fixtures:
 - duration tolerance and missing durations;
 - candidate scoring and evidence labels;
 - one-to-one assignment and ambiguous candidates;
+- duplicate Spotify occurrences distinguished by collection position;
+- playlist-position numbering, album-track numbering, and preserved gaps;
 - template token rendering;
+- visual template builder behavior and omission of missing fields;
 - invalid-character sanitization;
 - collision suffix generation;
 - playlist/album URL parsing;
@@ -18,10 +21,12 @@ Cover pure logic with table-driven fixtures:
 ## Integration Tests
 
 - folder inventory with supported and unsupported extensions;
+- hidden audio files and visible read-only/unrenameable conditions;
 - metadata extraction from representative MP3, FLAC, OGG, and M4A fixtures;
 - Spotify client behavior using mocked responses, including private-playlist authorization, pagination, rate limits, and expired tokens;
 - IPC validation between renderer and main process;
 - operation manifest creation and guarded undo.
+- retained rename history and guarded undo of an older eligible operation.
 
 ## Filesystem Safety Tests
 
@@ -57,11 +62,13 @@ Verify the primary flow and important states:
 - OAuth success and failure;
 - playlist and album loading;
 - every match appearing in the review table;
+- duplicate playlist tracks displayed as separate collection positions;
 - low-confidence warnings;
 - manual match changes and exclusions;
 - expected filename preview updates;
+- token editor and visual template builder produce equivalent previews;
 - confirmation warnings and completion results;
-- undo availability and result reporting.
+- undo history selection and result reporting.
 
 ## End-to-End Checks
 

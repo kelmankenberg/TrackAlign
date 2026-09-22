@@ -10,6 +10,7 @@ The persistent shell contains:
 - **Left navigation rail**: contains icon buttons for all primary pages. Use Lucide icons consistently, show the active page, and provide accessible names and tooltips for every icon button. In expanded mode, the rail is 240-280px wide and may show icon labels alongside the icons.
 - **Page content area**: hosts the current workflow or settings page without nesting the experience inside a modal or decorative card.
 - **Right Help panel**: slides in from the right when the page Help icon is selected. It displays context-sensitive guidance for the current page and can be dismissed without losing state.
+- **More menu and Changelog panel**: the More menu contains Restart TrackAlign, Changelog, and version information. Changelog opens as a resizable structured panel, with one collapsible section per version and only the latest version expanded by default.
 - **Status bar**: remains available at the bottom of the window and reports relevant folder, collection, matching, rename, warning, and undo information.
 
 ### Navigation Layout States
@@ -35,6 +36,8 @@ Additional pages may be added when they represent a durable user task rather tha
 
 The Help button appears on every page and uses a Lucide help icon with an accessible label. Help content is specific to the current page and should reflect the current workflow state, such as explaining why a match is low confidence or why a rename is blocked. Opening and closing the panel must preserve selections, edits, and scroll position where practical.
 
+Help is static documentation initially. Dynamic actions may be considered later. The Help and Changelog panels can be resized up to 40% of the app window width; the left navigation rail cannot be resized.
+
 ## Status Bar Behavior
 
 The status bar should show concise, current information rather than instructional copy. Examples include `12 files selected`, `Playlist loaded`, `Matching 8 of 24`, `3 warnings`, `Rename complete`, or `Undo available`. Use a distinct visual treatment for warnings and errors and provide more detail in the page or Help panel when needed.
@@ -48,6 +51,8 @@ The status bar should show concise, current information rather than instructiona
 5. **Confirm rename**: the user reviews warnings, including unmatched items and collisions, then confirms the operation.
 6. **Completion**: the app reports per-file results and offers Undo for the operation.
 
+Navigation layout state and user preferences persist between launches. Multiple completed rename operations remain available in undo history.
+
 ## Review Table
 
 Recommended columns:
@@ -57,6 +62,7 @@ Recommended columns:
 - Matched Spotify track and artist
 - Confidence indicator and score
 - Expected filename
+- Source collection position
 - Status or warning
 - Manual match action
 
@@ -68,7 +74,7 @@ A user can open a row's match selector and choose from collection tracks not alr
 
 ## Rename Template
 
-Provide a template input with token insertion rather than requiring users to memorize syntax. Initial tokens:
+Provide both a token editor and a visual template builder. Initial tokens:
 
 - `{trackNumber}`
 - `{artist}`
@@ -76,7 +82,7 @@ Provide a template input with token insertion rather than requiring users to mem
 - `{title}`
 - `{year}`
 
-Preview the rendered name for each row. Sanitize characters that are invalid on the target platform and show when a value is missing. Preserve the source extension.
+Preview the rendered name for each row. Sanitize characters that are invalid on the target platform and omit unavailable fields. Preserve the source extension.
 
 ## States and Errors
 
@@ -89,5 +95,6 @@ The UI should have explicit states for loading a folder, authenticating, loading
 - Icon-only controls must have accessible names and tooltips; Lucide icons are visual affordances, not the only label.
 - Dialogs must have clear focus management and cancel actions.
 - Long filenames and track titles must truncate visually without changing the underlying value.
+- Hidden files and read-only files must have clear, non-color-only visual indicators; read-only rows may use the agreed light-red treatment without relying on color alone.
 - Use platform-native folder/file dialogs through Electron.
 - The right-side Help panel must have logical focus behavior and must not trap focus after it is closed.

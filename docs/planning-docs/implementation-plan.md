@@ -7,6 +7,8 @@
 - Add platform-aware path and filename utilities.
 - Build the persistent shell: custom top toolbar, Lucide left navigation rail, page outlet, right-side Help panel, and status bar.
 - Implement the three-state navigation layout: 240-280px expanded rail, icon-only rail, and toolbar navigation after the title, with a far-left cycle button.
+- Persist the selected navigation layout between launches and add the More menu, Changelog panel, and version information.
+- Add visual inventory states for hidden audio files and read-only or otherwise unrenameable files; hide unsupported non-audio files.
 - Define renderer state boundaries so navigation and Help do not discard in-progress work.
 
 ## Phase 1: Local Folder Inventory
@@ -22,6 +24,7 @@
 - Store tokens securely and refresh them as needed.
 - Parse playlist and album URLs.
 - Fetch ordered tracks, including private collections when authorized.
+- Preserve playlist positions, album track order, and duplicate playlist occurrences.
 - Add clear handling for expired authorization, unavailable collections, rate limits, and network failures.
 
 ## Phase 3: Matching Domain
@@ -37,14 +40,15 @@
 - Build the current-filename/expected-filename comparison table.
 - Add selection, exclusion, manual match changes, and unmatched states.
 - Add template tokens, sanitization, and live previews.
+- Add both token editing and visual template building; omit unavailable fields.
 - Validate the complete plan before confirmation.
 
 ## Phase 5: Rename and Undo
 
 - Implement collision suffixing.
 - Implement two-phase temporary renaming for batches.
-- Record operation manifests and partial results.
-- Implement guarded undo for the most recent operation.
+- Record operation manifests and partial results in retained rename history.
+- Implement guarded undo for any eligible retained operation.
 
 ## Phase 6: Packaging and Release Hardening
 

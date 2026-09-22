@@ -17,6 +17,7 @@ People who download music with SpotDL or similar tools and need local filenames 
 - A far-left top-toolbar collapse button, before the app title, that cycles navigation through expanded rail, icon-only rail, and toolbar-navigation modes. In toolbar-navigation mode, all navigation icons appear in a button group immediately after the title; another toggle restores the expanded rail.
 - A Settings page for user preferences.
 - A context-sensitive Help button on every page that opens a right-side slide-out Help panel.
+- A More menu containing Restart TrackAlign, Changelog, and version information. Changelog opens a structured collapsible panel with only the latest version expanded by default.
 - A status bar for current operation, selection, loading, warning, and completion information.
 - Folder selection and display of audio files supported by the application: MP3, FLAC, OGG, and M4A.
 - Per-file selection, including Select All and Select None.
@@ -28,7 +29,9 @@ People who download music with SpotDL or similar tools and need local filenames 
 - Manual correction or removal of a proposed match before renaming.
 - User-configurable rename templates using fields such as artist, album, title, track number, and year.
 - Safe rename execution with collision suffixes rather than overwriting existing files.
-- Undo of the most recent completed rename operation.
+- Undo history for multiple completed rename operations.
+- Hidden audio files shown with distinct visual treatment; unsupported non-audio files hidden from the inventory.
+- Visible read-only or otherwise unrenameable file warnings when a folder is loaded.
 
 ## Out of Scope for MVP
 
@@ -38,6 +41,7 @@ People who download music with SpotDL or similar tools and need local filenames 
 - Automatic synchronization of a local library after the initial rename.
 - Cloud storage or multi-device operation.
 - Batch processing of multiple folders in one operation.
+- Dynamic/action-oriented Help content beyond static contextual documentation.
 
 ## Functional Requirements
 
@@ -59,13 +63,19 @@ The Settings page allows users to customize supported preferences, including the
 
 Every page includes a Help icon button. Selecting it opens a right-side slide-out panel containing help relevant to the current page and state. The panel can be closed without losing work and must not obscure essential controls without an available way to dismiss or resize it.
 
+Help is static documentation in the initial release. The Help and Changelog panels may be resized up to 40% of the app window width. The left navigation rail is not resizable.
+
+### FR-0.3.1: Provide Global App Menu
+
+The More menu provides Restart TrackAlign, Changelog, and version information. Changelog opens in a structured panel using collapsible version sections, with only the latest version expanded by default. Changelog expansion state does not need to persist.
+
 ### FR-0.4: Display Status
 
 The status bar displays specific current information such as selected folder, file counts, Spotify collection state, matching progress, warnings, rename results, and undo availability. Status updates must distinguish normal information, warnings, errors, and in-progress work.
 
 ### FR-1: Load Local Files
 
-The user can choose a folder and see supported audio files with their current filenames and readable metadata. The user can select any subset of the files.
+The user can choose a folder and see supported audio files with their current filenames and readable metadata. Hidden audio files are included and visually distinguished. Unsupported non-audio files are hidden. Read-only or otherwise unrenameable files are visibly flagged when the folder is loaded, and cannot be silently treated as safe to rename.
 
 ### FR-2: Load Spotify Collection
 
@@ -73,7 +83,7 @@ The user can authenticate with Spotify, enter a playlist or album URL, and load 
 
 ### FR-3: Generate Matches
 
-The application proposes at most one selected local file for each playlist/album track and at most one collection track for each local file. It uses metadata, filename fallback, and duration as matching evidence.
+The application proposes at most one selected local file for each collection occurrence and at most one collection occurrence for each local file. It uses metadata, filename fallback, and duration as matching evidence. Duplicate Spotify tracks are distinct occurrences identified by playlist position. Playlist numbering follows playlist position; album numbering follows album track order. Numbering preserves source positions, including gaps caused by excluded or unmatched tracks.
 
 ### FR-4: Review Matches
 
@@ -85,7 +95,7 @@ The user can change a file's matched track, leave a file unmatched, exclude file
 
 ### FR-6: Configure Names
 
-The user can choose a rename template from supported metadata fields and preview the resulting filename for every selected file. The original extension is preserved.
+The user can configure a rename template using both token editing and a visual template builder, then preview the resulting filename for every selected file. Missing fields are omitted. The original extension is preserved.
 
 ### FR-7: Apply Renames
 
@@ -93,7 +103,7 @@ The application validates the complete rename plan before changing files. Existi
 
 ### FR-8: Undo
 
-After a successful or partially successful operation, the user can undo the file changes represented by the operation manifest. Undo must never overwrite a newer file without explicit handling and explanation.
+After a successful or partially successful operation, the user can choose from retained rename-operation history and undo an operation represented by its manifest. Undo must never overwrite a newer file without explicit handling and explanation.
 
 ## Quality Requirements
 
@@ -102,4 +112,4 @@ After a successful or partially successful operation, the user can undo the file
 - Keep filesystem work in the main process and expose only narrow, validated IPC operations.
 - Preserve file extensions unless the user explicitly configures otherwise in a future version.
 - Make network, authorization, parsing, matching, and filesystem failures actionable.
-- Keep a local operation manifest sufficient to undo the most recent rename operation.
+- Keep a local history of operation manifests sufficient to undo multiple rename operations.

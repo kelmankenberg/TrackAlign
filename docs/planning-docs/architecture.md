@@ -14,11 +14,12 @@ The renderer should implement a persistent shell with:
 - a left navigation rail with Lucide icon buttons and accessible labels;
 - a page outlet for the workspace and Settings pages;
 - a right-side Help panel that can slide in with page/state-specific content;
+- a resizable Changelog panel, capped at 40% of the app window width;
 - a persistent status bar driven by application state.
 
 Keep the workflow state separate from page presentation so navigating to Settings or opening Help does not discard an in-progress matching or rename plan. The shell should support direct manipulation and conditional controls instead of requiring a rigid wizard state machine.
 
-Represent navigation layout as an explicit renderer state, for example `expanded`, `iconOnly`, or `toolbar`. The expanded rail must constrain to 240-280px. In `iconOnly`, keep the rail visible with icons only. In `toolbar`, hide the rail and render the complete navigation icon group immediately after the title. The collapse control remains at the far left of the toolbar in every state and cycles back to `expanded` from `toolbar`.
+Represent navigation layout as an explicit persisted renderer state, for example `expanded`, `iconOnly`, or `toolbar`. The expanded rail must constrain to 240-280px and must not be user-resizable. In `iconOnly`, keep the rail visible with icons only. In `toolbar`, hide the rail and render the complete navigation icon group immediately after the title. The collapse control remains at the far left of the toolbar in every state and cycles back to `expanded` from `toolbar`.
 
 ## Security Boundaries
 
@@ -36,10 +37,11 @@ Validate paths and plans in the main process even when the renderer already vali
 ## Core Domain Models
 
 - `LocalAudioFile`: absolute path, original filename, extension, parsed metadata, selection state.
-- `SpotifyTrack`: collection position, Spotify ID, title, artists, album, release year, duration, and track number.
+- `SpotifyTrack`: collection occurrence position, Spotify ID, title, artists, album, release year, duration, and track number. Duplicate Spotify IDs remain distinct by collection position.
 - `MatchProposal`: local file ID, collection track ID, confidence score, evidence, source (`automatic` or `manual`), and status.
 - `RenamePlanItem`: source path, target filename/path, match reference, included flag, and validation warnings.
 - `RenameOperation`: timestamp, completed items, original paths, new paths, and undo eligibility.
+- `RenameHistory`: retained rename operations and their guarded undo state.
 - `AppPreferences`: persisted user settings such as the default rename template and other supported preferences.
 - `UiStatus`: current operation, progress, warnings, errors, and undo availability for the status bar.
 
@@ -51,13 +53,13 @@ Validate paths and plans in the main process even when the renderer already vali
 4. Main process obtains ordered tracks and returns normalized data.
 5. Matching runs in the domain layer and returns proposals with evidence.
 6. Renderer edits selection, matches, and template; the main process revalidates each plan.
-7. Main process performs a collision-aware staged rename, records the manifest, and reports results.
+7. Main process performs a collision-aware staged rename, records the manifest in rename history, and reports results.
 
 ## Filesystem Rename Strategy
 
 Use a two-phase operation for batches: first move sources to unique temporary names within the same folder, then move temporary names to final names. This avoids source/target cycles and makes swaps safe. Do not overwrite existing paths. Add a deterministic suffix such as ` (1)`, ` (2)` before the extension when a target is already occupied.
 
-Write the operation manifest only after the relevant moves are known, and update it as execution progresses so partial failures can be reported accurately. Undo should use the manifest and verify the current path before moving anything back.
+Write the operation manifest only after the relevant moves are known, and update it as execution progresses so partial failures can be reported accurately. Retain completed manifests in local rename history. Undo should use the selected manifest and verify the current path before moving anything back.
 
 ## External Dependencies
 

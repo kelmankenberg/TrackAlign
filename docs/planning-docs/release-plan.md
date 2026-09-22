@@ -7,10 +7,13 @@
 - Authorized users can load public collections and private collections available to their account.
 - Supported local formats can be inventoried and matched with filename fallback.
 - The review table shows every proposed match and expected filename.
+- Playlist positions and album track order are preserved, including duplicate playlist occurrences and gaps.
 - Users can exclude files and manually correct assignments.
-- Templates support artist, album, title, track number, and year.
+- Templates support both token editing and visual construction; missing fields are omitted.
 - Renames use collision suffixes and never silently overwrite files.
-- Undo works for the most recent operation and handles changed files safely.
+- Multiple rename operations are retained and eligible operations can be undone safely.
+- Hidden audio files and read-only/unrenameable files are clearly represented; unsupported non-audio files are hidden.
+- The navigation layout persists, and the More menu exposes Restart TrackAlign, Changelog, and version information.
 - Automated tests and platform smoke tests pass.
 
 ## Rollout Stages

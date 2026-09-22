@@ -11,7 +11,7 @@ For each local file, normalize:
 - track number and year;
 - filename without extension.
 
-For each Spotify track, normalize title, artists, album, duration, track number, year, and collection position.
+For each Spotify track occurrence, normalize title, artists, album, duration, track number, year, and collection position. Duplicate tracks are separate occurrences when their collection positions differ.
 
 ## Normalization
 
@@ -34,9 +34,9 @@ The exact weights should be calibrated with fixtures rather than treated as perm
 
 ## Assignment Rules
 
-Use a global assignment step rather than independently selecting the best track for every file. This reduces duplicate assignments and improves results when several files are similar. Enforce one-to-one assignment for the selected files and collection tracks in the MVP.
+Use a global assignment step rather than independently selecting the best track for every file. This reduces duplicate assignments and improves results when several files are similar. Enforce one-to-one assignment for selected files and collection occurrences, while allowing the same Spotify track ID to appear more than once at different playlist positions.
 
-If a playlist contains the same Spotify track more than once, represent the occurrences by collection position and make the duplicate behavior an explicit product decision before implementation. The current product assumption is that duplicate tracks are not expected; duplicate local filenames should still be handled as separate files.
+Playlist numbering follows playlist position, including gaps for excluded or unmatched positions. Album numbering follows album track order. Duplicate local filenames are separate files and should remain distinguishable after renaming.
 
 ## Review Thresholds
 

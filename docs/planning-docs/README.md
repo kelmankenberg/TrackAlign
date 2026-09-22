@@ -10,13 +10,17 @@ TrackAlign is a desktop application that matches selected local audio files to a
 - Interaction model: a formless, direct-manipulation workspace rather than a traditional multi-step form flow.
 - App shell: custom top toolbar with the app title and control buttons, plus an icon-based left navigation rail.
 - Navigation layout: the rail cycles between expanded, icon-only, and toolbar-navigation modes.
+- Navigation layout state persists between launches; the rail is not resizable.
 - Help: every page exposes a Help button that opens context-sensitive help in a right-side slide-out panel.
+- Help is static in the initial release; Help and Changelog panels can resize up to 40% of the window width.
 - Status: a persistent status bar displays relevant operational information.
 - Spotify access: OAuth, including private playlists when authorization permits.
 - Input: select any number of files from a loaded folder, with Select All and Select None controls.
 - Matching: use audio metadata first, with filenames as a fallback; every result appears in review.
 - Rename output: user-customizable metadata tokens, with collision suffixes.
-- Recovery: provide undo support.
+- Rename templates support token editing and a visual builder; missing fields are omitted.
+- Recovery: retain history for multiple undoable rename operations.
+- Ordering: playlists use playlist position, albums use album track order, and excluded/unmatched positions leave numbering gaps.
 - Preferences: provide a Settings page for user-configurable app behavior.
 
 ## Document Map
