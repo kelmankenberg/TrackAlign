@@ -17,7 +17,7 @@ People who download music with SpotDL or similar tools and need local filenames 
 - A collapsible left navigation rail containing icon buttons for all primary pages and actions, using the Lucide icon library. The expanded rail is 240-280px wide.
 - A far-left top-toolbar collapse button, before the app title, that cycles navigation through expanded rail, icon-only rail, and toolbar-navigation modes. In toolbar-navigation mode, all navigation icons appear in a button group immediately after the title; another toggle restores the expanded rail.
 - A Settings page for user preferences.
-- Light and dark appearance modes with typical accessible color schemes, persisted between launches and available from Settings and the More menu.
+- Four light and four dark appearance presets, including the existing greenish dark mode and a VS Code Default Dark-inspired option. The selected preset persists between launches and is available from Settings; the More menu provides a quick light/dark family switch.
 - A context-sensitive Help button on every page that opens a right-side slide-out Help panel.
 - A More menu containing Restart TrackAlign, Changelog, and version information. Changelog opens a structured collapsible panel with only the latest version expanded by default.
 - A status bar for current operation, selection, loading, warning, and completion information.
