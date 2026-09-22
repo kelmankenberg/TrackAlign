@@ -28,6 +28,7 @@ TrackAlign is a desktop application that matches selected local audio files to a
 
 ## Document Map
 
+0. [Implementation Roadmap](roadmap.md)
 1. [Product Requirements](product-requirements.md)
 2. [User Experience](user-experience.md)
 3. [Architecture](architecture.md)
