@@ -40,7 +40,11 @@ Use temporary directories to verify:
 Verify the persistent shell and direct-manipulation behavior:
 
 - the custom top toolbar renders the TrackAlign title and app control buttons;
-- the left navigation rail exposes all primary pages with Lucide icons, accessible names, active state, and tooltips;
+- the far-left toolbar collapse button cycles from expanded rail to icon-only rail to toolbar navigation and back to expanded rail;
+- the expanded left navigation rail is 240-280px wide and exposes all primary pages with Lucide icons, labels, accessible names, active state, and tooltips;
+- the icon-only rail exposes every navigation destination through icons and tooltips;
+- toolbar-navigation mode hides the rail and places all navigation icons in a button group immediately after the title;
+- the selected page and in-progress workspace state survive every navigation layout transition;
 - navigation preserves in-progress workspace state;
 - Settings loads, persists, and resets supported preferences;
 - every page exposes Help and the context-sensitive panel slides in from the right and closes without losing work;

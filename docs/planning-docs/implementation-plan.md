@@ -6,6 +6,7 @@
 - Establish main/preload/renderer boundaries and typed IPC contracts.
 - Add platform-aware path and filename utilities.
 - Build the persistent shell: custom top toolbar, Lucide left navigation rail, page outlet, right-side Help panel, and status bar.
+- Implement the three-state navigation layout: 240-280px expanded rail, icon-only rail, and toolbar navigation after the title, with a far-left cycle button.
 - Define renderer state boundaries so navigation and Help do not discard in-progress work.
 
 ## Phase 1: Local Folder Inventory

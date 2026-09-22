@@ -10,13 +10,15 @@
 
 The renderer should implement a persistent shell with:
 
-- a custom top toolbar containing the app title and global control buttons;
+- a custom top toolbar containing the far-left navigation collapse button, app title, and global control buttons;
 - a left navigation rail with Lucide icon buttons and accessible labels;
 - a page outlet for the workspace and Settings pages;
 - a right-side Help panel that can slide in with page/state-specific content;
 - a persistent status bar driven by application state.
 
 Keep the workflow state separate from page presentation so navigating to Settings or opening Help does not discard an in-progress matching or rename plan. The shell should support direct manipulation and conditional controls instead of requiring a rigid wizard state machine.
+
+Represent navigation layout as an explicit renderer state, for example `expanded`, `iconOnly`, or `toolbar`. The expanded rail must constrain to 240-280px. In `iconOnly`, keep the rail visible with icons only. In `toolbar`, hide the rail and render the complete navigation icon group immediately after the title. The collapse control remains at the far left of the toolbar in every state and cycles back to `expanded` from `toolbar`.
 
 ## Security Boundaries
 

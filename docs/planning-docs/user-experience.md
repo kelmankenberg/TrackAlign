@@ -6,11 +6,21 @@ TrackAlign uses a formless desktop workspace: the user works directly with the l
 
 The persistent shell contains:
 
-- **Custom top toolbar**: displays the TrackAlign app title and app control buttons such as navigation/context actions, undo, and other global commands. Controls should use icons where the meaning is familiar and include accessible labels/tooltips.
-- **Left navigation rail**: contains icon buttons for all primary pages. Use Lucide icons consistently, show the active page, and provide accessible names and tooltips for every icon button.
+- **Custom top toolbar**: displays a navigation collapse button at the far left, followed by the TrackAlign app title and app control buttons such as undo and other global commands. Controls should use icons where the meaning is familiar and include accessible labels/tooltips.
+- **Left navigation rail**: contains icon buttons for all primary pages. Use Lucide icons consistently, show the active page, and provide accessible names and tooltips for every icon button. In expanded mode, the rail is 240-280px wide and may show icon labels alongside the icons.
 - **Page content area**: hosts the current workflow or settings page without nesting the experience inside a modal or decorative card.
 - **Right Help panel**: slides in from the right when the page Help icon is selected. It displays context-sensitive guidance for the current page and can be dismissed without losing state.
 - **Status bar**: remains available at the bottom of the window and reports relevant folder, collection, matching, rename, warning, and undo information.
+
+### Navigation Layout States
+
+The collapse button cycles through these states in order:
+
+1. **Expanded rail**: a 240-280px left rail shows navigation icons and their labels.
+2. **Icon-only rail**: the left rail remains visible at a compact width and shows only navigation icons with tooltips.
+3. **Toolbar navigation**: the left rail is hidden and all navigation icons appear in a button group immediately after the app title in the top toolbar.
+
+Activating the toggle in toolbar-navigation mode returns the app to the expanded rail. The current page remains selected and the content area must resize without losing workflow state. The toggle itself must expose an accessible label describing the next layout state.
 
 ## Primary Pages
 
