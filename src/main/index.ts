@@ -259,7 +259,7 @@ async function applyRenames(items: RenameItem[]) {
     const stem = basename(item.targetName, extname(item.targetName))
     let targetPath = join(directory, item.targetName)
     let suffix = 1
-    while (reserved.has(targetPath) || (await pathExists(targetPath)) && (!sourcePaths.has(targetPath) || targetPath === item.sourcePath)) {
+    while (reserved.has(targetPath) || (await pathExists(targetPath) && targetPath !== item.sourcePath && !sourcePaths.has(targetPath))) {
       targetPath = join(directory, `${stem} (${suffix})${extension}`)
       suffix += 1
     }
