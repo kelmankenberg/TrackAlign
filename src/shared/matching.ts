@@ -23,7 +23,7 @@ export interface MatchProposal {
   trackTitle: string
   trackArtist: string
   score: number
-  status: 'matched' | 'review' | 'unmatched'
+  status: 'matched' | 'review' | 'unmatched' | 'manual' | 'excluded'
   evidence: string[]
 }
 

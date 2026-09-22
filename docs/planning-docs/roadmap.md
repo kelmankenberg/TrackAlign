@@ -54,7 +54,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Implement initial fuzzy candidate scoring with duration as a disambiguator.
 - [x] Implement initial one-to-one assignment by collection occurrence.
 - [x] Show every proposal, confidence, evidence, and warning in the review table.
-- [ ] Support manual reassignment, exclusion, and unmatched files.
+- [x] Support manual reassignment, exclusion, and unmatched files.
 - [ ] Preserve collection-position numbering gaps.
 
 ## Rename and Recovery
