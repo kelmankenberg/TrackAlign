@@ -59,9 +59,10 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 ## Rename and Recovery
 
-- [ ] Implement token editor and visual template builder.
-- [ ] Support artist, album, title, track number, and year fields.
-- [ ] Omit unavailable fields and sanitize platform-invalid characters.
+- [x] Implement initial token editor with persisted template state.
+- [x] Support artist, title, and track number fields in the expected filename preview.
+- [x] Omit unavailable fields and sanitize platform-invalid characters.
+- [ ] Complete the visual template builder with album and year field previews.
 - [ ] Add collision suffixes without overwriting existing files.
 - [ ] Use staged renames for cycles and swaps.
 - [ ] Persist multiple rename-operation manifests.
