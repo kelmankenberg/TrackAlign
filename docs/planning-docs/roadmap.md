@@ -25,14 +25,14 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 ## Local Files
 
-- [ ] Select a folder through Electron's native dialog.
-- [ ] Enumerate MP3, FLAC, OGG, and M4A files.
-- [ ] Include hidden audio files with distinct visual treatment.
-- [ ] Hide unsupported non-audio files.
-- [ ] Ignore and report symbolic links.
-- [ ] Detect and visibly flag read-only or otherwise unrenameable files.
-- [ ] Add Select All and Select None controls.
-- [ ] Extract and normalize audio metadata.
+- [x] Select a folder through Electron's native dialog.
+- [x] Enumerate MP3, FLAC, OGG, and M4A files.
+- [x] Include hidden audio files with distinct visual treatment.
+- [x] Hide unsupported non-audio files.
+- [x] Ignore and report symbolic links.
+- [x] Detect and visibly flag read-only or otherwise unrenameable files.
+- [x] Add Select All and Select None controls.
+- [x] Extract basic audio metadata.
 
 ## Spotify Integration
 
@@ -75,7 +75,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 **Completed checkpoint:** project foundation plus the app shell using mocked workspace data. The first usable checkpoint demonstrates the three navigation states, Settings, Help, Changelog, status bar, and preserved UI state without requiring Spotify or filesystem integration.
 
-**Next slice:** wire the native folder picker and local audio inventory into the Workspace page.
+**Next slice:** begin Spotify OAuth with mocked collection loading, then connect the review model to selected local files.
 
 ## Open Blockers
 
