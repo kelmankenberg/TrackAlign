@@ -164,6 +164,8 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
   const [collection, setCollection] = useState<MockCollection | null>(null)
   const [sourceLoading, setSourceLoading] = useState(false)
   const [sourceError, setSourceError] = useState('')
+  const [renameLoading, setRenameLoading] = useState(false)
+  const [renameCompleted, setRenameCompleted] = useState(false)
   const [manualMatches, setManualMatches] = useState<Record<string, number | null>>({})
   const [excludedPaths, setExcludedPaths] = useState<Set<string>>(new Set())
   const automaticProposals: MatchProposal[] = inventory && collection ? matchFiles((inventory.files ?? []).filter((file) => selectedPaths.has(file.path)), collection.tracks) : []
@@ -228,12 +230,45 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
     }
   }
 
+  const applyRename = async () => {
+    if (!inventory || !collection) return
+    const items = proposals.flatMap((proposal) => {
+      if (!proposal.trackPosition || proposal.status === 'excluded') return []
+      const localFile = inventory.files?.find((file) => file.path === proposal.filePath)
+      const track = collection.tracks.find((candidate) => candidate.position === proposal.trackPosition)
+      if (!localFile || !track) return []
+      return [{ sourcePath: localFile.path, targetName: renderFilename(renameTemplate, { trackNumber: track.position, artist: track.artist, title: track.title }, localFile.extension) }]
+    })
+    setRenameLoading(true)
+    onStatusChange('Validating rename plan...')
+    try {
+      await window.trackAlign.rename.apply(items)
+      setRenameCompleted(true)
+      onStatusChange(`${items.length} files renamed · undo available`)
+    } catch (error) {
+      onStatusChange(error instanceof Error ? error.message : 'Rename could not be completed')
+    } finally {
+      setRenameLoading(false)
+    }
+  }
+
+  const undoRename = async () => {
+    try {
+      await window.trackAlign.rename.undoLatest()
+      setRenameCompleted(false)
+      onStatusChange('Rename undone')
+    } catch (error) {
+      onStatusChange(error instanceof Error ? error.message : 'Undo could not be completed')
+    }
+  }
+
   return <section className="workspace-page">
     <div className="page-heading"><div><span className="eyebrow">Workspace</span><h1>Align your collection.</h1><p>Match local audio to Spotify order, review the plan, and rename with confidence.</p></div><button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button></div>
     <div className="hero-grid">
       <button className="action-card primary-card" onClick={chooseFolder} disabled={loading}><div className="card-icon"><FolderOpen size={22} /></div><div><span className="card-kicker">Step 01</span><h2>{loading ? 'Inspecting folder...' : 'Choose a folder'}</h2><p>Open a local folder to inspect its audio files.</p></div><span className="card-arrow">→</span></button>
       <button className="action-card" onClick={() => setSourceOpen(true)}><div className="card-icon"><ListMusic size={22} /></div><div><span className="card-kicker">Step 02</span><h2>{collection ? collection.name : 'Connect Spotify'}</h2><p>{collection ? `${collection.tracks.length} tracks loaded in ${collection.type} order.` : 'Load a playlist or album and its original order.'}</p></div><span className="card-arrow">→</span></button>
     </div>
+      {inventory && collection && <div className="rename-actions"><span><strong>Ready to apply:</strong> {proposals.filter((proposal) => proposal.status === 'matched' || proposal.status === 'manual').length} matched files</span><div><button className="primary-button" onClick={applyRename} disabled={renameLoading || renameCompleted}>{renameLoading ? 'Renaming...' : renameCompleted ? 'Rename complete' : 'Apply rename'}</button>{renameCompleted && <button className="secondary-button" onClick={undoRename}>Undo</button>}</div></div>}
     {sourceOpen && <div className="source-dialog" role="dialog" aria-label="Load Spotify collection"><div className="source-dialog-heading"><div><span className="eyebrow">Spotify source</span><h2>Load a playlist or album</h2></div><button className="toolbar-icon" onClick={() => setSourceOpen(false)} title="Close" aria-label="Close"><X size={18} /></button></div><div className="source-tabs" role="tablist" aria-label="Spotify source type"><button className={sourceType === 'playlist' ? 'selected' : ''} onClick={() => setSourceType('playlist')}>Playlist</button><button className={sourceType === 'album' ? 'selected' : ''} onClick={() => setSourceType('album')}>Album</button></div><label className="source-label">Spotify URL<input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://open.spotify.com/..." /></label><p className="source-note">TrackAlign will open Spotify for authorization, then load the ordered collection using your access.</p>{sourceError && <p className="source-error" role="alert">{sourceError}</p>}<button className="primary-button" onClick={loadSpotifyCollection} disabled={sourceLoading}><ListMusic size={16} />{sourceLoading ? 'Connecting...' : 'Sign in and load collection'}</button></div>}
     {collection && <div className="collection-preview"><div className="preview-heading"><div><span className="eyebrow">Spotify collection</span><h2>{collection.name}</h2></div><span className="status-pill"><span className="status-dot" />{collection.tracks.length} tracks</span></div><div className="collection-track-list">{collection.tracks.map((track) => <div className="collection-track" key={track.position}><span className="track-position">{String(track.position).padStart(2, '0')}</span><div><strong>{track.title}</strong><span>{track.artist}</span></div><span className="track-duration">{track.duration}</span></div>)}</div></div>}
     {inventory && collection && <div className="review-preview"><div className="preview-heading"><div><span className="eyebrow">Alignment review</span><h2>Proposed matches</h2></div><span className="status-pill"><span className="status-dot" />{proposals.filter((proposal) => proposal.status === 'matched' || proposal.status === 'manual').length} assigned</span></div><div className="review-table"><div className="review-header"><span>Local file</span><span>Spotify match</span><span>Expected filename</span><span>Confidence</span><span>Status</span></div>{proposals.map((proposal) => { const track = collection.tracks.find((candidate) => candidate.position === proposal.trackPosition); const localFile = inventory.files?.find((file) => file.path === proposal.filePath); const expectedName = track && localFile ? renderFilename(renameTemplate, { trackNumber: track.position, artist: track.artist, title: track.title }, localFile.extension) : '—'; return <div className="review-row" key={proposal.filePath}><span className="review-file">{proposal.fileName}</span><select className="match-select" value={proposal.status === 'excluded' ? 'excluded' : proposal.trackPosition ?? ''} onChange={(event) => { if (event.target.value === 'excluded') setExcludedPaths((current) => new Set(current).add(proposal.filePath)); else { setExcludedPaths((current) => { const next = new Set(current); next.delete(proposal.filePath); return next }); setManualMatches((current) => ({ ...current, [proposal.filePath]: event.target.value ? Number(event.target.value) : null })) } }} aria-label={`Match for ${proposal.fileName}`}><option value="">No match</option><option value="excluded">Exclude file</option>{collection.tracks.map((candidate) => <option key={candidate.position} value={candidate.position}>{String(candidate.position).padStart(2, '0')} · {candidate.artist} — {candidate.title}</option>)}</select><span className="expected-name">{expectedName}</span><span>{Math.round(proposal.score * 100)}% {proposal.evidence.length ? `· ${proposal.evidence.join(', ')}` : ''}</span><span className={`match-status ${proposal.status}`}>{proposal.status}</span></div> })}</div></div>}

@@ -3,6 +3,10 @@ import { contextBridge, ipcRenderer } from 'electron'
 contextBridge.exposeInMainWorld('trackAlign', {
   appName: 'TrackAlign',
   inspectFolder: () => ipcRenderer.invoke('folder:inspect'),
+  rename: {
+    apply: (items: Array<{ sourcePath: string; targetName: string }>) => ipcRenderer.invoke('rename:apply', items),
+    undoLatest: () => ipcRenderer.invoke('rename:undo-latest'),
+  },
   spotify: {
     authenticate: () => ipcRenderer.invoke('spotify:authenticate'),
     loadCollection: (sourceUrl: string) => ipcRenderer.invoke('spotify:load-collection', sourceUrl),

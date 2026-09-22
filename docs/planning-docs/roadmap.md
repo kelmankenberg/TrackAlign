@@ -63,10 +63,10 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Support artist, title, and track number fields in the expected filename preview.
 - [x] Omit unavailable fields and sanitize platform-invalid characters.
 - [ ] Complete the visual template builder with album and year field previews.
-- [ ] Add collision suffixes without overwriting existing files.
-- [ ] Use staged renames for cycles and swaps.
-- [ ] Persist multiple rename-operation manifests.
-- [ ] Provide guarded undo for eligible operations.
+- [x] Add collision suffixes without overwriting existing files.
+- [x] Use staged renames for cycles and swaps.
+- [x] Persist multiple rename-operation manifests.
+- [x] Provide guarded undo for eligible operations.
 
 ## Quality and Release
 
@@ -80,7 +80,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 **Completed checkpoint:** project foundation plus the app shell using mocked workspace data. The first usable checkpoint demonstrates the three navigation states, Settings, Help, Changelog, status bar, and preserved UI state without requiring Spotify or filesystem integration.
 
-**Next slice:** add manual reassignment/exclusion controls and strengthen OAuth callback/error coverage.
+**Next slice:** add filesystem safety tests, strengthen OAuth callback/error coverage, and complete album/year template preview fields.
 
 ## Open Blockers
 

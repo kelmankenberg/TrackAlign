@@ -29,6 +29,10 @@ interface Window {
 	trackAlign: {
 		appName: string
 		inspectFolder: () => Promise<FolderInventory>
+		rename: {
+			apply: (items: Array<{ sourcePath: string; targetName: string }>) => Promise<{ id: string }>
+			undoLatest: () => Promise<{ undone: true; id: string }>
+		}
 		spotify: {
 			authenticate: () => Promise<{ authenticated: true }>
 			loadCollection: (sourceUrl: string) => Promise<{ type: 'playlist' | 'album'; name: string; url: string; tracks: Array<{ position: number; artist: string; title: string; duration: string; durationMs?: number }> }>
