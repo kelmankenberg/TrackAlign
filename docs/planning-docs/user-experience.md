@@ -11,7 +11,7 @@ The persistent shell contains:
 - **Page content area**: hosts the current workflow or settings page without nesting the experience inside a modal or decorative card.
 - **Right Help panel**: slides in from the right when the page Help icon is selected. It displays context-sensitive guidance for the current page and can be dismissed without losing state.
 - **More menu and Changelog panel**: the More menu contains Restart TrackAlign, Changelog, and version information. Changelog opens as a resizable structured panel, with one collapsible section per version and only the latest version expanded by default.
-- **Appearance**: Settings provides four light presets and four dark presets, including the existing greenish theme and a VS Code Default Dark-inspired option. The More menu provides a quick light/dark family switch. The selected preset persists between launches.
+- **Appearance**: Settings provides four light presets and four dark presets, including the existing greenish theme and a VS Code Default Dark-inspired option. The selected preset persists between launches.
 - **Status bar**: remains available at the bottom of the window and reports relevant folder, collection, matching, rename, warning, and undo information.
 
 ### Navigation Layout States
@@ -30,7 +30,7 @@ The initial navigation should include:
 
 - **Workspace**: folder loading, file selection, Spotify source loading, matching review, expected filename preview, and rename confirmation.
 - **Settings**: preferences such as rename template defaults and other user-configurable behavior.
-- **Settings**: includes an Appearance control with four Light options and four Dark options; each option has a descriptive name and the active preset is clear.
+- **Settings**: includes the Appearance control with four Light options and four Dark options; each option has a descriptive name and the active preset is clear.
 
 Additional pages may be added when they represent a durable user task rather than a transient dialog. Global actions should remain available from the toolbar or the relevant page.
 

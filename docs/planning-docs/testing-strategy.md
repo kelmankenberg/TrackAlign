@@ -55,7 +55,6 @@ Verify the persistent shell and direct-manipulation behavior:
 - navigation preserves in-progress workspace state;
 - Settings loads, persists, and resets supported preferences;
 - Settings exposes four light and four dark presets, including the VS Code Default Dark-inspired option;
-- the More menu switches theme families without losing the last selected preset in either family;
 - the selected theme preset persists after restart;
 - every page exposes Help and the context-sensitive panel slides in from the right and closes without losing work;
 - the status bar reports selection, loading, progress, warning, completion, and undo states;

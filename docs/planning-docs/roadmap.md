@@ -46,6 +46,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [ ] Load public and authorized private/collaborative playlists.
 - [ ] Load albums and preserve album track order.
 - [ ] Preserve playlist positions and duplicate playlist occurrences.
+- [x] Provide mocked playlist/album URL loading and ordered collection preview while OAuth is under construction.
 
 ## Matching and Review
 
@@ -78,7 +79,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 **Completed checkpoint:** project foundation plus the app shell using mocked workspace data. The first usable checkpoint demonstrates the three navigation states, Settings, Help, Changelog, status bar, and preserved UI state without requiring Spotify or filesystem integration.
 
-**Next slice:** begin Spotify OAuth with mocked collection loading, then connect the review model to selected local files.
+**Next slice:** implement Spotify OAuth with PKCE, replacing the mocked source loader while preserving its collection model and review preview.
 
 ## Open Blockers
 

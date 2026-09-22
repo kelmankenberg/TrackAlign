@@ -27,6 +27,14 @@ type NavMode = 'expanded' | 'iconOnly' | 'toolbar'
 type Page = 'workspace' | 'settings'
 type SidePanel = 'help' | 'changelog' | null
 type Theme = 'light-paper' | 'light-warm' | 'light-blue' | 'light-high-contrast' | 'dark-moss' | 'dark-vscode' | 'dark-charcoal' | 'dark-midnight'
+type CollectionType = 'playlist' | 'album'
+
+interface MockCollection {
+  type: CollectionType
+  name: string
+  url: string
+  tracks: Array<{ position: number; artist: string; title: string; duration: string }>
+}
 
 const lightThemes: Array<{ id: Theme; label: string; description: string }> = [
   { id: 'light-paper', label: 'Paper', description: 'Current TrackAlign light' },
@@ -81,13 +89,6 @@ function App() {
     localStorage.setItem(isDarkTheme(nextTheme) ? 'trackalign-last-dark-theme' : 'trackalign-last-light-theme', nextTheme)
   }
 
-  const toggleThemeFamily = () => {
-    const nextFamily = isDarkTheme(theme) ? 'light' : 'dark'
-    const storedTheme = localStorage.getItem(`trackalign-last-${nextFamily}-theme`)
-    const fallback = nextFamily === 'dark' ? 'dark-vscode' : 'light-paper'
-    setAppTheme((allThemes.some((option) => option.id === storedTheme) ? storedTheme : fallback) as Theme)
-  }
-
   const renderNavItems = (showLabels: boolean) => navItems.map(({ id, label, icon: Icon }) => (
     <button
       className={`nav-item ${page === id ? 'active' : ''}`}
@@ -123,7 +124,6 @@ function App() {
         {moreOpen && <div className="more-menu">
           <button onClick={() => window.location.reload()}><RotateCcw size={16} />Restart TrackAlign</button>
           <button onClick={() => { setPanel('changelog'); setMoreOpen(false) }}><History size={16} />Changelog</button>
-          <button onClick={toggleThemeFamily}>{isDarkTheme(theme) ? <Sun size={16} /> : <Moon size={16} />}Use {isDarkTheme(theme) ? 'light' : 'dark'} mode</button>
           <div className="menu-version">TrackAlign 0.1.0</div>
         </div>}
       </header>
@@ -150,6 +150,10 @@ function Workspace({ onHelp, onStatusChange }: { onHelp: () => void; onStatusCha
   const [inventory, setInventory] = useState<FolderInventory | null>(null)
   const [loading, setLoading] = useState(false)
   const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set())
+  const [sourceOpen, setSourceOpen] = useState(false)
+  const [sourceType, setSourceType] = useState<CollectionType>('playlist')
+  const [sourceUrl, setSourceUrl] = useState('https://open.spotify.com/playlist/example')
+  const [collection, setCollection] = useState<MockCollection | null>(null)
 
   const chooseFolder = async () => {
     setLoading(true)
@@ -184,12 +188,34 @@ function Workspace({ onHelp, onStatusChange }: { onHelp: () => void; onStatusCha
     onStatusChange(`${nextSelection.size} audio files selected`)
   }
 
+  const loadMockCollection = () => {
+    const tracks = sourceType === 'playlist'
+      ? [
+        { position: 1, artist: 'The Paper Kites', title: 'Bloom', duration: '3:30' },
+        { position: 2, artist: 'Khruangbin', title: 'Friday Morning', duration: '4:02' },
+        { position: 3, artist: 'Men I Trust', title: 'Show Me How', duration: '3:35' },
+        { position: 4, artist: 'Tycho', title: 'A Walk', duration: '5:19' },
+      ]
+      : [
+        { position: 1, artist: 'Bon Iver', title: 'Holocene', duration: '5:36' },
+        { position: 2, artist: 'Bon Iver', title: 'Towers', duration: '3:54' },
+        { position: 3, artist: 'Bon Iver', title: 'Michicant', duration: '3:58' },
+        { position: 4, artist: 'Bon Iver', title: 'Hinnom, TX', duration: '2:48' },
+      ]
+    const nextCollection = { type: sourceType, name: sourceType === 'playlist' ? 'Quiet Hours' : 'Bon Iver — Bon Iver', url: sourceUrl, tracks }
+    setCollection(nextCollection)
+    setSourceOpen(false)
+    onStatusChange(`${nextCollection.name} loaded (mock) · ${tracks.length} tracks`)
+  }
+
   return <section className="workspace-page">
     <div className="page-heading"><div><span className="eyebrow">Workspace</span><h1>Align your collection.</h1><p>Match local audio to Spotify order, review the plan, and rename with confidence.</p></div><button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button></div>
     <div className="hero-grid">
       <button className="action-card primary-card" onClick={chooseFolder} disabled={loading}><div className="card-icon"><FolderOpen size={22} /></div><div><span className="card-kicker">Step 01</span><h2>{loading ? 'Inspecting folder...' : 'Choose a folder'}</h2><p>Open a local folder to inspect its audio files.</p></div><span className="card-arrow">→</span></button>
-      <button className="action-card"><div className="card-icon"><ListMusic size={22} /></div><div><span className="card-kicker">Step 02</span><h2>Connect Spotify</h2><p>Load a playlist or album and its original order.</p></div><span className="card-arrow">→</span></button>
+      <button className="action-card" onClick={() => setSourceOpen(true)}><div className="card-icon"><ListMusic size={22} /></div><div><span className="card-kicker">Step 02</span><h2>{collection ? collection.name : 'Connect Spotify'}</h2><p>{collection ? `${collection.tracks.length} tracks loaded in ${collection.type} order.` : 'Load a playlist or album and its original order.'}</p></div><span className="card-arrow">→</span></button>
     </div>
+    {sourceOpen && <div className="source-dialog" role="dialog" aria-label="Load Spotify collection"><div className="source-dialog-heading"><div><span className="eyebrow">Spotify source</span><h2>Load a playlist or album</h2></div><button className="toolbar-icon" onClick={() => setSourceOpen(false)} title="Close" aria-label="Close"><X size={18} /></button></div><div className="source-tabs" role="tablist" aria-label="Spotify source type"><button className={sourceType === 'playlist' ? 'selected' : ''} onClick={() => setSourceType('playlist')}>Playlist</button><button className={sourceType === 'album' ? 'selected' : ''} onClick={() => setSourceType('album')}>Album</button></div><label className="source-label">Spotify URL<input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://open.spotify.com/..." /></label><p className="source-note">Mock source loading is active while Spotify OAuth is being built. The ordered collection will feed the matching review.</p><button className="primary-button" onClick={loadMockCollection}><ListMusic size={16} />Load mock collection</button></div>}
+    {collection && <div className="collection-preview"><div className="preview-heading"><div><span className="eyebrow">Spotify collection · mock</span><h2>{collection.name}</h2></div><span className="status-pill"><span className="status-dot" />{collection.tracks.length} tracks</span></div><div className="collection-track-list">{collection.tracks.map((track) => <div className="collection-track" key={track.position}><span className="track-position">{String(track.position).padStart(2, '0')}</span><div><strong>{track.title}</strong><span>{track.artist}</span></div><span className="track-duration">{track.duration}</span></div>)}</div></div>}
     <div className="workspace-preview"><div className="preview-heading"><div><span className="eyebrow">Local inventory</span><h2>{inventory?.folderPath ?? 'Your alignment will appear here'}</h2></div><span className="status-pill"><span className="status-dot" />{inventory ? `${selectedPaths.size} of ${inventory.files?.length ?? 0} selected` : 'Waiting'}</span></div>{inventory ? <div className="inventory-table"><div className="inventory-summary"><span>{inventory.ignoredSymlinkCount ? `${inventory.ignoredSymlinkCount} symbolic link${inventory.ignoredSymlinkCount === 1 ? '' : 's'} ignored.` : 'No symbolic links found.'}</span><span className="selection-actions"><button onClick={() => setAllSelected(true)}>Select all</button><button onClick={() => setAllSelected(false)}>Select none</button></span></div>{inventory.files?.length ? inventory.files.map((file) => <div className={`inventory-row ${file.hidden ? 'hidden-file' : ''} ${file.readOnly ? 'read-only' : ''}`} key={file.path}><label className="file-select"><input type="checkbox" checked={selectedPaths.has(file.path)} onChange={() => toggleFile(file.path)} aria-label={`Select ${file.name}`} /></label><div className="file-name"><FileMusic size={16} /><span>{file.name}</span></div><span>{file.metadata.artist || 'Unknown artist'}</span><span>{file.metadata.title || 'Metadata unavailable'}</span>{file.readOnly && <span className="file-warning">Read-only</span>}{file.hidden && <span className="file-warning">Hidden</span>}</div>) : <div className="empty-state compact"><div className="empty-icon"><FileMusic size={25} /></div><p>No supported audio files found.</p><span>TrackAlign supports MP3, FLAC, OGG, and M4A.</span></div>}</div> : <div className="empty-state"><div className="empty-icon"><FileMusic size={25} /></div><p>Select a folder to begin building your review table.</p><span>Current filenames and expected Spotify filenames will sit side by side.</span></div>}</div>
   </section>
 }
