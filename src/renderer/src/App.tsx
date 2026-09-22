@@ -8,6 +8,7 @@ import {
   History,
   LayoutDashboard,
   ListMusic,
+  ListOrdered,
   Menu,
   Minus,
   Moon,
@@ -18,7 +19,6 @@ import {
   Settings,
   Square,
   SlidersHorizontal,
-  Sparkles,
   Sun,
   X,
 } from 'lucide-react'
@@ -78,7 +78,7 @@ function App() {
           <PanelLeft size={19} />
         </button>
         <div className="brand-lockup">
-          <div className="brand-mark"><Sparkles size={16} /></div>
+          <div className="brand-mark"><ListOrdered size={17} /></div>
           <span className="brand-name">TrackAlign</span>
         </div>
         {navMode === 'toolbar' && <nav className="toolbar-nav" aria-label="Primary navigation">{renderNavItems(false)}</nav>}

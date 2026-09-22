@@ -13,6 +13,7 @@ People who download music with SpotDL or similar tools and need local filenames 
 - Linux and Windows desktop builds.
 - A formless desktop workspace organized around persistent navigation and direct manipulation rather than a traditional wizard or form sequence.
 - A custom top toolbar containing the TrackAlign title and app control buttons.
+- The TrackAlign app icon uses Lucide `ListOrdered` in the custom titlebar and a matching native window/taskbar asset.
 - A collapsible left navigation rail containing icon buttons for all primary pages and actions, using the Lucide icon library. The expanded rail is 240-280px wide.
 - A far-left top-toolbar collapse button, before the app title, that cycles navigation through expanded rail, icon-only rail, and toolbar-navigation modes. In toolbar-navigation mode, all navigation icons appear in a button group immediately after the title; another toggle restores the expanded rail.
 - A Settings page for user preferences.

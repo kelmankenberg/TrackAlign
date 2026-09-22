@@ -69,6 +69,7 @@ function createWindow() {
     minWidth: 980,
     minHeight: 640,
     title: 'TrackAlign',
+    icon: join(app.getAppPath(), 'resources/list-ordered.svg'),
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       contextIsolation: true,

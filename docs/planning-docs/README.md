@@ -9,6 +9,7 @@ TrackAlign is a desktop application that matches selected local audio files to a
 - Renderer: React.
 - Interaction model: a formless, direct-manipulation workspace rather than a traditional multi-step form flow.
 - App shell: custom top toolbar with the app title and control buttons, plus an icon-based left navigation rail.
+- App icon: Lucide `ListOrdered` in the custom titlebar and matching native window/taskbar asset.
 - Navigation layout: the rail cycles between expanded, icon-only, and toolbar-navigation modes.
 - Navigation layout state persists between launches; the rail is not resizable.
 - Help: every page exposes a Help button that opens context-sensitive help in a right-side slide-out panel.
