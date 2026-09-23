@@ -9,7 +9,11 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Initialize Electron + React + TypeScript project structure.
 - [x] Establish main process, preload bridge, renderer, and shared domain boundaries.
 - [x] Add build and typecheck commands.
-- [ ] Add Linux and Windows packaging configuration.
+- [x] Add Linux and Windows packaging configuration.
+  - [x] electron-builder config for Linux (AppImage, deb) and Windows (nsis, portable); `npm run package:linux` / `npm run package:win`.
+  - [x] Verified `electron-builder --linux --dir` produces a valid unpacked build.
+  - [ ] Custom packaged app icon assets (PNG/ICO) beyond the placeholder SVG.
+  - [!] Unpacked Linux debug builds segfault under the default sandbox in this environment (missing root-owned setuid `chrome-sandbox`); this is a known Linux/Electron limitation for `--dir` builds, not expected to affect real AppImage/deb artifacts.
 
 ## App Shell
 
