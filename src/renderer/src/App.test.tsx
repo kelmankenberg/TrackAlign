@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
@@ -82,5 +82,27 @@ describe('App shell', () => {
   it('renders the local inventory empty state before a folder is loaded', () => {
     render(<App />)
     expect(screen.getByText(/select a folder to begin/i)).toBeInTheDocument()
+  })
+
+  it('zooms with keyboard shortcuts and persists the level', async () => {
+    render(<App />)
+    expect(screen.getByTitle(/zoom level/i)).toHaveTextContent('100%')
+
+    fireEvent.keyDown(window, { key: '=', ctrlKey: true })
+    expect(screen.getByTitle(/zoom level/i)).toHaveTextContent('110%')
+    expect(localStorage.getItem('trackalign-zoom')).toBe('1.1')
+
+    fireEvent.keyDown(window, { key: '-', ctrlKey: true })
+    fireEvent.keyDown(window, { key: '-', ctrlKey: true })
+    expect(screen.getByTitle(/zoom level/i)).toHaveTextContent('90%')
+
+    fireEvent.keyDown(window, { key: '0', ctrlKey: true })
+    expect(screen.getByTitle(/zoom level/i)).toHaveTextContent('100%')
+  })
+
+  it('zooms with Ctrl+wheel', () => {
+    render(<App />)
+    fireEvent.wheel(window, { ctrlKey: true, deltaY: -100 })
+    expect(screen.getByTitle(/zoom level/i)).toHaveTextContent('110%')
   })
 })

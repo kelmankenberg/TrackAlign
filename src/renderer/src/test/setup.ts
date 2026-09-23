@@ -28,6 +28,10 @@ if (typeof window !== 'undefined') {
         close: vi.fn().mockResolvedValue(true),
         toggleDevTools: vi.fn().mockResolvedValue(true),
       },
+      zoom: {
+        set: vi.fn().mockResolvedValue(1),
+        get: vi.fn().mockResolvedValue(1),
+      },
     },
   })
 }

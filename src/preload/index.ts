@@ -20,4 +20,8 @@ contextBridge.exposeInMainWorld('trackAlign', {
     close: () => ipcRenderer.invoke('window:close'),
     toggleDevTools: () => ipcRenderer.invoke('window:toggle-devtools'),
   },
+  zoom: {
+    set: (factor: number) => ipcRenderer.invoke('zoom:set', factor),
+    get: () => ipcRenderer.invoke('zoom:get'),
+  },
 })

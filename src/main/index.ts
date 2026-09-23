@@ -234,6 +234,14 @@ app.whenReady().then(() => {
     else window.webContents.openDevTools({ mode: 'detach' })
     return true
   })
+  ipcMain.handle('zoom:set', (event, factor: number) => {
+    const webContents = BrowserWindow.fromWebContents(event.sender)?.webContents
+    if (!webContents) return 1
+    const clamped = Math.min(2, Math.max(0.5, factor))
+    webContents.setZoomFactor(clamped)
+    return clamped
+  })
+  ipcMain.handle('zoom:get', (event) => BrowserWindow.fromWebContents(event.sender)?.webContents.getZoomFactor() ?? 1)
   createWindow()
 
   app.on('activate', () => {

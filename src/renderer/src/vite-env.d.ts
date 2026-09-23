@@ -46,5 +46,9 @@ interface Window {
 			close: () => Promise<boolean>
 			toggleDevTools: () => Promise<boolean>
 		}
+		zoom: {
+			set: (factor: number) => Promise<number>
+			get: () => Promise<number>
+		}
 	}
 }

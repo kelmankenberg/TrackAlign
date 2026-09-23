@@ -76,6 +76,11 @@ const changelog = [
   { version: 'Next', date: 'Planned', notes: ['Local audio folder inventory', 'Spotify OAuth with PKCE', 'Matching review workspace'] },
 ]
 
+const ZOOM_MIN = 0.5
+const ZOOM_MAX = 2
+const ZOOM_STEP = 0.1
+const clampZoom = (factor: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(factor * 100) / 100))
+
 function App() {
   const [navMode, setNavMode] = useState<NavMode>(() => (localStorage.getItem('trackalign-nav-mode') as NavMode) || 'expanded')
   const [theme, setTheme] = useState<Theme>(getStoredTheme)
@@ -85,6 +90,39 @@ function App() {
   const [moreOpen, setMoreOpen] = useState(false)
   const [expandedChangelog, setExpandedChangelog] = useState('0.1.0')
   const [status, setStatus] = useState('Ready for a folder')
+  const [zoomFactor, setZoomFactor] = useState(() => clampZoom(Number(localStorage.getItem('trackalign-zoom')) || 1))
+
+  const applyZoom = (factor: number) => {
+    const clamped = clampZoom(factor)
+    setZoomFactor(clamped)
+    localStorage.setItem('trackalign-zoom', String(clamped))
+    window.trackAlign.zoom.set(clamped).catch(() => undefined)
+  }
+
+  useEffect(() => {
+    window.trackAlign.zoom.set(zoomFactor).catch(() => undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey)) return
+      if (event.key === '0') { event.preventDefault(); applyZoom(1) }
+      else if (event.key === '-' || event.key === '_') { event.preventDefault(); applyZoom(zoomFactor - ZOOM_STEP) }
+      else if (event.key === '=' || event.key === '+') { event.preventDefault(); applyZoom(zoomFactor + ZOOM_STEP) }
+    }
+    const handleWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey) return
+      event.preventDefault()
+      applyZoom(zoomFactor + (event.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP))
+    }
+    window.addEventListener('keydown', handleKeydown)
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      window.removeEventListener('keydown', handleKeydown)
+      window.removeEventListener('wheel', handleWheel)
+    }
+  }, [zoomFactor])
 
   const runWindowCommand = async (command: () => Promise<boolean>, label: string) => {
     try {
@@ -168,7 +206,7 @@ function App() {
           {panel === 'help' ? <div className="panel-copy"><p>Load a folder, choose the tracks you want to organize, then connect a Spotify playlist or album to review the proposed order.</p><p>Every match remains visible for inspection. You can adjust the plan before any files are renamed.</p><div className="help-tip"><HelpCircle size={16} /><span>Contextual guidance will follow the page you are viewing.</span></div><div className="help-tip"><HelpCircle size={16} /><span>Albums and playlists you create always work. Spotify blocks third-party access to algorithmic playlists such as Discover Weekly, Daily Mix, Release Radar, Blend, and Made For You &mdash; these will fail to load with a &ldquo;Forbidden&rdquo; error no app can bypass.</span></div></div> : <div className="changelog-list">{changelog.map((entry) => <section className="changelog-entry" key={entry.version}><button className="changelog-toggle" onClick={() => setExpandedChangelog(expandedChangelog === entry.version ? '' : entry.version)}><span><strong>{entry.version}</strong><small>{entry.date}</small></span><ChevronDown className={expandedChangelog === entry.version ? 'rotated' : ''} size={17} /></button>{expandedChangelog === entry.version && <ul>{entry.notes.map((note) => <li key={note}>{note}</li>)}</ul>}</section>)}</div>}
         </aside>}
       </div>
-      <footer className="statusbar"><span className="status-dot" />{status}</footer>
+      <footer className="statusbar"><span className="status-dot" />{status}<span className="statusbar-spacer" /><span className="zoom-indicator" title="Zoom level (Ctrl+0/-/=/mouse wheel)">{Math.round(zoomFactor * 100)}%</span></footer>
     </div>
   )
 }

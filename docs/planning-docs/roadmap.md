@@ -28,6 +28,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
   - [x] Static right-side Help panel.
   - [x] Changelog panel with collapsible versions, latest expanded by default.
   - [x] Persistent status bar.
+  - [x] Ctrl+0/-/=/mouse-wheel zoom control with the current level shown at the right of the status bar.
   - [x] Four light and four dark mode presets, including VS Code Default Dark, with persisted selection in Settings and a More-menu family toggle.
 
 ## Local Files
