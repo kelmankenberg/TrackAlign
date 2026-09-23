@@ -203,6 +203,9 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
       if (!result.cancelled) {
         setInventory(result)
         setSelectedPaths(new Set(result.files?.map((file) => file.path)))
+        setManualMatches({})
+        setExcludedPaths(new Set())
+        setRenameCompleted(false)
         onStatusChange(`${result.files?.length ?? 0} audio files selected`)
       } else {
         onStatusChange('Ready for a folder')
@@ -240,6 +243,9 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
       const nextCollection = await window.trackAlign.spotify.loadCollection(sourceUrl)
       setCollection(nextCollection)
       setSourceOpen(false)
+      setManualMatches({})
+      setExcludedPaths(new Set())
+      setRenameCompleted(false)
       onStatusChange(`${nextCollection.name} loaded · ${nextCollection.tracks.length} tracks`)
     } catch (error) {
       const message = describeError(error, 'Spotify could not be connected.')
