@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, screen, shell } from 'electr
 import { createServer } from 'node:http'
 import { randomBytes, createHash } from 'node:crypto'
 import { join } from 'node:path'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs'
 import 'dotenv/config'
 import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
 import { fetchSpotifyCollection } from '../shared/spotify'
@@ -162,9 +162,34 @@ async function scanFolder(folderPath: string) {
   return runScanFolder(folderPath)
 }
 
+function lastFolderPath() {
+  return join(app.getPath('userData'), 'last-folder.json')
+}
+
+function loadLastFolder(): string | undefined {
+  try {
+    const raw = readFileSync(lastFolderPath(), 'utf-8')
+    const parsed = JSON.parse(raw) as { folderPath?: string }
+    if (!parsed.folderPath) return undefined
+    if (existsSync(parsed.folderPath) && statSync(parsed.folderPath).isDirectory()) return parsed.folderPath
+    return undefined
+  } catch {
+    return undefined
+  }
+}
+
+function saveLastFolder(folderPath: string) {
+  try {
+    writeFileSync(lastFolderPath(), JSON.stringify({ folderPath }))
+  } catch {
+    // best-effort persistence; ignore write failures
+  }
+}
+
 async function inspectFolder() {
-  const selection = await dialog.showOpenDialog({ properties: ['openDirectory'] })
+  const selection = await dialog.showOpenDialog({ properties: ['openDirectory'], defaultPath: loadLastFolder() })
   if (selection.canceled || selection.filePaths.length === 0) return { cancelled: true as const }
+  saveLastFolder(selection.filePaths[0])
   return scanFolder(selection.filePaths[0])
 }
 
