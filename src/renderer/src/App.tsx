@@ -80,6 +80,16 @@ function App() {
   const [expandedChangelog, setExpandedChangelog] = useState('0.1.0')
   const [status, setStatus] = useState('Ready for a folder')
 
+  const runWindowCommand = async (command: () => Promise<boolean>, label: string) => {
+    try {
+      const result = await command()
+      if (result === false) setStatus(`${label} could not be completed`)
+    } catch (error) {
+      console.error(`TrackAlign window command failed: ${label}`, error)
+      setStatus(error instanceof Error ? error.message : `${label} could not be completed`)
+    }
+  }
+
   const cycleNavMode = () => {
     const nextMode: NavMode = navMode === 'expanded' ? 'iconOnly' : navMode === 'iconOnly' ? 'toolbar' : 'expanded'
     setNavMode(nextMode)
@@ -126,15 +136,15 @@ function App() {
           <button className="toolbar-action" onClick={() => setPanel('help')} title="Open contextual help" aria-label="Open contextual help"><CircleHelp size={18} /></button>
           <button className="toolbar-action" onClick={() => setMoreOpen((open) => !open)} title="More options" aria-label="More options"><MoreHorizontal size={19} /></button>
           <div className="window-controls" aria-label="Window controls">
-            <button className="window-control" onClick={() => window.trackAlign.window.minimize()} title="Minimize" aria-label="Minimize"><Minus size={15} /></button>
-            <button className="window-control" onClick={() => window.trackAlign.window.toggleMaximize()} title="Maximize or restore" aria-label="Maximize or restore"><Square size={13} /></button>
-            <button className="window-control close-control" onClick={() => window.trackAlign.window.close()} title="Close" aria-label="Close"><X size={15} /></button>
+            <button className="window-control" onClick={() => runWindowCommand(() => window.trackAlign.window.minimize(), 'Minimize')} title="Minimize" aria-label="Minimize"><Minus size={15} /></button>
+            <button className="window-control" onClick={() => runWindowCommand(() => window.trackAlign.window.toggleMaximize(), 'Maximize')} title="Maximize or restore" aria-label="Maximize or restore"><Square size={13} /></button>
+            <button className="window-control close-control" onClick={() => runWindowCommand(() => window.trackAlign.window.close(), 'Close')} title="Close" aria-label="Close"><X size={15} /></button>
           </div>
         </div>
         {moreOpen && <div className="more-menu">
           <button onClick={() => window.location.reload()}><RotateCcw size={16} />Restart TrackAlign</button>
           <button onClick={() => { setPanel('changelog'); setMoreOpen(false) }}><History size={16} />Changelog</button>
-          <button onClick={() => { window.trackAlign.window.toggleDevTools(); setMoreOpen(false) }}><Settings size={16} />Developer Tools</button>
+          <button onClick={() => { runWindowCommand(() => window.trackAlign.window.toggleDevTools(), 'Developer Tools'); setMoreOpen(false) }}><Settings size={16} />Developer Tools</button>
           <div className="menu-version">TrackAlign 0.1.0</div>
         </div>}
       </header>
