@@ -82,6 +82,9 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
   - [x] Album/year template rendering and duplicate playlist occurrence coverage.
 - [-] Add integration tests for metadata, OAuth, IPC, filesystem safety, and undo history.
   - [x] Filesystem safety and undo-history tests (collision suffixing, staged swaps, no-op renames, invalid names, guarded undo) against real temp directories.
+  - [x] Folder inventory tests against real temp directories (extension filtering, hidden files, symlinks, read-only flags, graceful metadata fallback).
+  - [x] Spotify collection tests with a mocked fetch (URL parsing, pagination, duplicate/position preservation, album metadata, 403/429 error detail).
+  - [ ] IPC boundary tests (renderer ↔ main) and packaged OAuth callback tests.
 - [ ] Add UI and accessibility tests for the shell and primary workflow.
 - [ ] Run packaged smoke tests on Linux and Windows.
 - [ ] Prepare user setup, OAuth, troubleshooting, and release documentation.

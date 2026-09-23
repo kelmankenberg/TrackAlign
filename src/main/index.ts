@@ -1,17 +1,14 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron'
 import { createServer } from 'node:http'
 import { randomBytes, createHash } from 'node:crypto'
-import { access, readdir } from 'node:fs/promises'
-import { constants } from 'node:fs'
 import { join } from 'node:path'
-import { parseFile } from 'music-metadata'
 import 'dotenv/config'
 import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
 import { fetchSpotifyCollection } from '../shared/spotify'
+import { scanFolder as runScanFolder } from '../shared/folderScanner'
 
 app.disableHardwareAcceleration()
 
-const supportedExtensions = new Set(['.mp3', '.flac', '.ogg', '.m4a'])
 const spotifyTokenEndpoint = 'https://accounts.spotify.com/api/token'
 const spotifyApiBase = 'https://api.spotify.com/v1'
 let spotifySession: { accessToken: string; refreshToken?: string; expiresAt: number } | null = null
@@ -161,54 +158,7 @@ function spotifyStatus() {
 }
 
 async function scanFolder(folderPath: string) {
-  const entries = await readdir(folderPath, { withFileTypes: true })
-  let ignoredSymlinkCount = 0
-  const files = []
-
-  for (const entry of entries) {
-    if (entry.isSymbolicLink()) {
-      ignoredSymlinkCount += 1
-      continue
-    }
-
-    if (!entry.isFile()) continue
-    const extension = entry.name.slice(entry.name.lastIndexOf('.')).toLowerCase()
-    if (!supportedExtensions.has(extension)) continue
-
-    const path = join(folderPath, entry.name)
-    let readOnly = false
-    try {
-      await access(path, constants.W_OK)
-    } catch {
-      readOnly = true
-    }
-
-    let metadata = {}
-    try {
-      const parsed = await parseFile(path, { duration: true })
-      metadata = {
-        title: parsed.common.title ?? '',
-        artist: parsed.common.artist ?? '',
-        album: parsed.common.album ?? '',
-        year: parsed.common.year ?? null,
-        trackNumber: parsed.common.track.no ?? null,
-        durationMs: parsed.format.duration ? Math.round(parsed.format.duration * 1000) : null,
-      }
-    } catch {
-      metadata = {}
-    }
-
-    files.push({
-      name: entry.name,
-      path,
-      extension,
-      hidden: entry.name.startsWith('.'),
-      readOnly,
-      metadata,
-    })
-  }
-
-  return { cancelled: false as const, folderPath, ignoredSymlinkCount, files }
+  return runScanFolder(folderPath)
 }
 
 async function inspectFolder() {
