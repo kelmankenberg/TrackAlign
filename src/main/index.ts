@@ -1,11 +1,12 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron'
 import { createServer } from 'node:http'
 import { randomBytes, createHash } from 'node:crypto'
-import { access, mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promises'
+import { access, readdir } from 'node:fs/promises'
 import { constants } from 'node:fs'
-import { dirname, extname, join, basename } from 'node:path'
+import { join } from 'node:path'
 import { parseFile } from 'music-metadata'
 import 'dotenv/config'
+import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
 
 app.disableHardwareAcceleration()
 
@@ -13,8 +14,6 @@ const supportedExtensions = new Set(['.mp3', '.flac', '.ogg', '.m4a'])
 const spotifyTokenEndpoint = 'https://accounts.spotify.com/api/token'
 const spotifyApiBase = 'https://api.spotify.com/v1'
 let spotifySession: { accessToken: string; refreshToken?: string; expiresAt: number } | null = null
-type RenameItem = { sourcePath: string; targetName: string }
-type RenameManifest = { id: string; createdAt: string; items: Array<{ originalPath: string; newPath: string }> }
 
 function spotifyClientId() {
   const clientId = process.env.SPOTIFY_CLIENT_ID
@@ -261,87 +260,12 @@ function historyPath() {
   return join(app.getPath('userData'), 'rename-history.json')
 }
 
-async function readRenameHistory(): Promise<RenameManifest[]> {
-  try {
-    return JSON.parse(await readFile(historyPath(), 'utf8')) as RenameManifest[]
-  } catch {
-    return []
-  }
-}
-
-async function writeRenameHistory(history: RenameManifest[]) {
-  await mkdir(dirname(historyPath()), { recursive: true })
-  await writeFile(historyPath(), JSON.stringify(history.slice(-20), null, 2), 'utf8')
-}
-
-function ensureSafeTargetName(targetName: string) {
-  if (!targetName || targetName === '.' || targetName === '..' || targetName.includes('/') || targetName.includes('\\')) throw new Error('A rename target contains an invalid filename.')
-}
-
 async function applyRenames(items: RenameItem[]) {
-  if (!items.length) throw new Error('Select at least one matched file before renaming.')
-  const sourcePaths = new Set(items.map((item) => item.sourcePath))
-  const reserved = new Set<string>()
-  const resolved = []
-
-  for (const item of items) {
-    ensureSafeTargetName(item.targetName)
-    const sourceInfo = await stat(item.sourcePath)
-    if (!sourceInfo.isFile()) throw new Error(`Source is not a regular file: ${basename(item.sourcePath)}`)
-    const directory = dirname(item.sourcePath)
-    const extension = extname(item.targetName) || extname(item.sourcePath)
-    const stem = basename(item.targetName, extname(item.targetName))
-    let targetPath = join(directory, item.targetName)
-    let suffix = 1
-    while (reserved.has(targetPath) || (await pathExists(targetPath) && targetPath !== item.sourcePath && !sourcePaths.has(targetPath))) {
-      targetPath = join(directory, `${stem} (${suffix})${extension}`)
-      suffix += 1
-    }
-    reserved.add(targetPath)
-    if (targetPath !== item.sourcePath) resolved.push({ sourcePath: item.sourcePath, targetPath })
-  }
-
-  const staged: Array<{ temporaryPath: string; targetPath: string; sourcePath: string }> = []
-  try {
-    for (const item of resolved) {
-      const temporaryPath = `${item.sourcePath}.trackalign-${randomBytes(8).toString('hex')}.tmp`
-      await rename(item.sourcePath, temporaryPath)
-      staged.push({ temporaryPath, targetPath: item.targetPath, sourcePath: item.sourcePath })
-    }
-    for (const item of staged) await rename(item.temporaryPath, item.targetPath)
-  } catch (error) {
-    for (const item of staged) {
-      if (await pathExists(item.temporaryPath)) await rename(item.temporaryPath, item.sourcePath).catch(() => undefined)
-    }
-    throw error
-  }
-
-  const manifest: RenameManifest = { id: randomBytes(10).toString('hex'), createdAt: new Date().toISOString(), items: staged.map((item) => ({ originalPath: item.sourcePath, newPath: item.targetPath })) }
-  const history = await readRenameHistory()
-  history.push(manifest)
-  await writeRenameHistory(history)
-  return manifest
+  return runApplyRenames(items, historyPath())
 }
 
 async function undoLatestRename() {
-  const history = await readRenameHistory()
-  const manifest = history.at(-1)
-  if (!manifest) throw new Error('There is no rename operation to undo.')
-  for (const item of manifest.items) {
-    if (!(await pathExists(item.newPath)) || await pathExists(item.originalPath)) throw new Error('Undo stopped because a file has changed since the rename operation.')
-  }
-  for (const item of manifest.items) await rename(item.newPath, item.originalPath)
-  await writeRenameHistory(history.slice(0, -1))
-  return { undone: true, id: manifest.id }
-}
-
-async function pathExists(path: string) {
-  try {
-    await stat(path)
-    return true
-  } catch {
-    return false
-  }
+  return runUndoLatestRename(historyPath())
 }
 
 function createWindow() {

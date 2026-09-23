@@ -75,7 +75,8 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 
 - [-] Add unit tests for matching, templates, sanitization, ordering, and collisions.
   - [x] Album/year template rendering and duplicate playlist occurrence coverage.
-- [ ] Add integration tests for metadata, OAuth, IPC, filesystem safety, and undo history.
+- [-] Add integration tests for metadata, OAuth, IPC, filesystem safety, and undo history.
+  - [x] Filesystem safety and undo-history tests (collision suffixing, staged swaps, no-op renames, invalid names, guarded undo) against real temp directories.
 - [ ] Add UI and accessibility tests for the shell and primary workflow.
 - [ ] Run packaged smoke tests on Linux and Windows.
 - [ ] Prepare user setup, OAuth, troubleshooting, and release documentation.
