@@ -132,6 +132,7 @@ function App() {
         {moreOpen && <div className="more-menu">
           <button onClick={() => window.location.reload()}><RotateCcw size={16} />Restart TrackAlign</button>
           <button onClick={() => { setPanel('changelog'); setMoreOpen(false) }}><History size={16} />Changelog</button>
+          <button onClick={() => { window.trackAlign.window.toggleDevTools(); setMoreOpen(false) }}><Settings size={16} />Developer Tools</button>
           <div className="menu-version">TrackAlign 0.1.0</div>
         </div>}
       </header>
@@ -189,8 +190,10 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
       } else {
         onStatusChange('Ready for a folder')
       }
-    } catch {
-      onStatusChange('Could not inspect that folder')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not inspect that folder'
+      console.error('TrackAlign folder inspection failed', error)
+      onStatusChange(message)
     } finally {
       setLoading(false)
     }

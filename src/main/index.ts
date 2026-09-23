@@ -347,6 +347,12 @@ app.whenReady().then(() => {
     else window?.maximize()
   })
   ipcMain.on('window:close', (event) => BrowserWindow.fromWebContents(event.sender)?.close())
+  ipcMain.on('window:toggle-devtools', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window) return
+    if (window.webContents.isDevToolsOpened()) window.webContents.closeDevTools()
+    else window.webContents.openDevTools({ mode: 'detach' })
+  })
   createWindow()
 
   app.on('activate', () => {

@@ -41,6 +41,7 @@ interface Window {
 			minimize: () => void
 			toggleMaximize: () => void
 			close: () => void
+			toggleDevTools: () => void
 		}
 	}
 }

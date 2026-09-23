@@ -15,5 +15,6 @@ contextBridge.exposeInMainWorld('trackAlign', {
     minimize: () => ipcRenderer.send('window:minimize'),
     toggleMaximize: () => ipcRenderer.send('window:toggle-maximize'),
     close: () => ipcRenderer.send('window:close'),
+    toggleDevTools: () => ipcRenderer.send('window:toggle-devtools'),
   },
 })
