@@ -65,7 +65,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Implement initial token editor with persisted template state.
 - [x] Support artist, title, and track number fields in the expected filename preview.
 - [x] Omit unavailable fields and sanitize platform-invalid characters.
-- [ ] Complete the visual template builder with album and year field previews.
+- [x] Complete the visual template builder with album and year field previews.
 - [x] Add collision suffixes without overwriting existing files.
 - [x] Use staged renames for cycles and swaps.
 - [x] Persist multiple rename-operation manifests.

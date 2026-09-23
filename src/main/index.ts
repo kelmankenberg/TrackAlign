@@ -7,6 +7,8 @@ import { dirname, extname, join, basename } from 'node:path'
 import { parseFile } from 'music-metadata'
 import 'dotenv/config'
 
+app.disableHardwareAcceleration()
+
 const supportedExtensions = new Set(['.mp3', '.flac', '.ogg', '.m4a'])
 const spotifyTokenEndpoint = 'https://accounts.spotify.com/api/token'
 const spotifyApiBase = 'https://api.spotify.com/v1'
@@ -155,9 +157,23 @@ function parseSpotifySource(sourceUrl: string) {
 async function loadSpotifyCollection(sourceUrl: string) {
   const source = parseSpotifySource(sourceUrl)
   const accessToken = await ensureSpotifyAccessToken()
-  type SpotifyTrack = { name: string; duration_ms: number; artists: Array<{ name: string }> }
+  type SpotifyTrack = { name: string; duration_ms: number; artists: Array<{ name: string }>; album?: { name: string; release_date?: string } }
   let endpoint: string | null = source.type === 'playlist' ? `${spotifyApiBase}/playlists/${source.id}/tracks?limit=50` : `${spotifyApiBase}/albums/${source.id}/tracks?limit=50`
   const sourceTracks: SpotifyTrack[] = []
+
+  let collectionName = source.type === 'playlist' ? 'Spotify playlist' : 'Spotify album'
+  let albumName = ''
+  let albumYear: number | null = null
+  const metaEndpoint = source.type === 'album' ? `${spotifyApiBase}/albums/${source.id}` : `${spotifyApiBase}/playlists/${source.id}?fields=name`
+  const metaResponse = await fetch(metaEndpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
+  if (metaResponse.ok) {
+    const metaPayload = await metaResponse.json() as { name?: string; release_date?: string }
+    if (metaPayload.name) collectionName = metaPayload.name
+    if (source.type === 'album') {
+      albumName = metaPayload.name ?? ''
+      albumYear = metaPayload.release_date ? Number(metaPayload.release_date.slice(0, 4)) || null : null
+    }
+  }
 
   while (endpoint) {
     const response = await fetch(endpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
@@ -176,10 +192,12 @@ async function loadSpotifyCollection(sourceUrl: string) {
     position: index + 1,
     artist: track.artists.map((artist) => artist.name).join(', '),
     title: track.name,
+    album: source.type === 'album' ? albumName : track.album?.name ?? '',
+    year: source.type === 'album' ? albumYear : (track.album?.release_date ? Number(track.album.release_date.slice(0, 4)) || null : null),
     duration: `${Math.floor(track.duration_ms / 60000)}:${String(Math.floor(track.duration_ms / 1000) % 60).padStart(2, '0')}`,
     durationMs: track.duration_ms,
   }))
-  return { type: source.type, name: source.type === 'playlist' ? 'Spotify playlist' : 'Spotify album', url: sourceUrl, tracks }
+  return { type: source.type, name: collectionName, url: sourceUrl, tracks }
 }
 
 async function scanFolder(folderPath: string) {
