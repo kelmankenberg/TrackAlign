@@ -132,4 +132,24 @@ describe('App shell', () => {
     await user.click(checkbox)
     expect(checkbox.checked).toBe(false)
   })
+
+  it('collapses and re-expands the local files panel', async () => {
+    vi.mocked(window.trackAlign.inspectFolder).mockResolvedValueOnce({
+      cancelled: false,
+      folderPath: '/music/Album',
+      ignoredSymlinkCount: 0,
+      files: [{ name: 'One.mp3', path: '/music/Album/One.mp3', extension: '.mp3', hidden: false, readOnly: false, metadata: {} }],
+    })
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('heading', { name: /choose a folder/i }).closest('button')!)
+    await screen.findAllByText('One.mp3')
+
+    await user.click(screen.getByRole('button', { name: 'Collapse local files' }))
+    expect(screen.queryByText('One.mp3')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Expand local files' }))
+    expect(await screen.findAllByText('One.mp3')).toHaveLength(2)
+  })
 })
