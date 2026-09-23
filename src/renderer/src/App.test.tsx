@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
-import { describe, expect, it, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
 beforeEach(() => {
   localStorage.clear()
+  vi.mocked(window.trackAlign.inspectFolder).mockReset()
 })
 
 describe('App shell', () => {
@@ -104,5 +105,31 @@ describe('App shell', () => {
     render(<App />)
     fireEvent.wheel(window, { ctrlKey: true, deltaY: -100 })
     expect(screen.getByTitle(/zoom level/i)).toHaveTextContent('110%')
+  })
+
+  it('shows local files with selection checkboxes before a Spotify collection is loaded', async () => {
+    vi.mocked(window.trackAlign.inspectFolder).mockResolvedValueOnce({
+      cancelled: false,
+      folderPath: '/music/Album',
+      ignoredSymlinkCount: 0,
+      files: [
+        { name: 'One.mp3', path: '/music/Album/One.mp3', extension: '.mp3', hidden: false, readOnly: false, metadata: {} },
+        { name: 'Two.mp3', path: '/music/Album/Two.mp3', extension: '.mp3', hidden: false, readOnly: false, metadata: {} },
+      ],
+    })
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('heading', { name: /choose a folder/i }).closest('button')!)
+    const fileNameCells = await screen.findAllByText('One.mp3')
+    expect(fileNameCells.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Connect Spotify to match')).toHaveLength(2)
+
+    const row = fileNameCells[0].closest('.inventory-row') as HTMLElement
+    const checkbox = within(row).getByRole('checkbox') as HTMLInputElement
+    expect(checkbox.checked).toBe(true)
+
+    await user.click(checkbox)
+    expect(checkbox.checked).toBe(false)
   })
 })

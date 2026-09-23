@@ -63,6 +63,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Implement initial fuzzy candidate scoring with duration as a disambiguator.
 - [x] Implement initial one-to-one assignment by collection occurrence.
 - [x] Show every proposal, confidence, evidence, and warning in the review table.
+  - [x] Merged the local file inventory and match review into one checkbox-driven table; unchecking a file is now the single exclusion mechanism.
 - [x] Support manual reassignment, exclusion, and unmatched files.
 - [x] Preserve collection-position numbering gaps (unmatched/excluded tracks are simply not renamed, so no renumbering occurs).
 
