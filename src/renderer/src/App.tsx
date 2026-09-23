@@ -125,6 +125,14 @@ const helpSections: Array<{ id: string; title: string; paragraphs: string[]; tip
     paragraphs: [],
     tip: 'Albums and playlists you create yourself always work best. Spotify blocks third-party apps from loading algorithmic playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You) and, without extended API access, playlists you don\u2019t own or follow can also fail with a \u201cForbidden\u201d error \u2014 this is a Spotify platform restriction, not a TrackAlign bug.',
   },
+  {
+    id: 'discussions',
+    title: 'Discussions',
+    paragraphs: [
+      'Connect your GitHub account once to browse, start, and reply to TrackAlign Discussions without leaving the app.',
+      'Filter the list by category, or use New discussion to start one. Open any discussion to read replies and post your own \u2014 use Refresh to pull in new activity.',
+    ],
+  },
 ]
 
 const ZOOM_MIN = 0.5
@@ -254,7 +262,7 @@ function App() {
         {navMode !== 'toolbar' && <aside className={`nav-rail ${navMode === 'iconOnly' ? 'icon-only' : ''}`} aria-label="Primary navigation">{renderNavItems(navMode === 'expanded')}</aside>}
         <main className="page-content">
           <div style={page === 'workspace' ? undefined : { display: 'none' }}><Workspace onHelp={() => setPanel('help')} onStatusChange={setStatus} renameTemplate={renameTemplate} /></div>
-          <div style={page === 'discussions' ? undefined : { display: 'none' }}><DiscussionsPage onStatusChange={setStatus} /></div>
+          <div style={page === 'discussions' ? undefined : { display: 'none' }}><DiscussionsPage onHelp={() => setPanel('help')} onStatusChange={setStatus} /></div>
           <div style={page === 'settings' ? undefined : { display: 'none' }}><SettingsPage onHelp={() => setPanel('help')} theme={theme} onThemeChange={setAppTheme} renameTemplate={renameTemplate} onRenameTemplateChange={setAppRenameTemplate} navMode={navMode} onNavModeChange={setAppNavMode} /></div>
         </main>
         {panel && <aside className="side-panel" aria-label={panel === 'help' ? 'Contextual help' : panel === 'changelog' ? 'Changelog' : 'Report an issue'}>
@@ -579,7 +587,7 @@ function ReportIssuePanel() {
 
 type DiscussionView = 'list' | 'thread' | 'new'
 
-function DiscussionsPage({ onStatusChange }: { onStatusChange: (status: string) => void }) {
+function DiscussionsPage({ onHelp, onStatusChange }: { onHelp: () => void; onStatusChange: (status: string) => void }) {
   const [connected, setConnected] = useState<boolean | null>(null)
   const [connecting, setConnecting] = useState(false)
   const [deviceCode, setDeviceCode] = useState<{ userCode: string; verificationUri: string } | null>(null)
@@ -702,7 +710,7 @@ function DiscussionsPage({ onStatusChange }: { onStatusChange: (status: string) 
 
   if (connected !== true) {
     return <section className="workspace-page">
-      <div className="page-heading"><div><span className="eyebrow">Discussions</span><h1>Join the conversation.</h1><p>Connect GitHub to browse and take part in TrackAlign Discussions.</p></div></div>
+      <div className="page-heading"><div><span className="eyebrow">Discussions</span><h1>Join the conversation.</h1><p>Connect GitHub to browse and take part in TrackAlign Discussions.</p></div><button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button></div>
       <div className="panel-copy">
         {deviceCode && <div className="help-tip"><HelpCircle size={16} /><span className="device-code-hint">Enter code <strong>{deviceCode.userCode}</strong> at the GitHub page that just opened. Waiting for confirmation…</span></div>}
         {connectError && <p className="source-error" role="alert">{connectError}</p>}
@@ -712,7 +720,7 @@ function DiscussionsPage({ onStatusChange }: { onStatusChange: (status: string) 
   }
 
   return <section className="workspace-page">
-    <div className="page-heading"><div><span className="eyebrow">Discussions</span><h1>Join the conversation.</h1><p>Browse ideas and questions from the TrackAlign community.</p></div><div className="page-heading-actions">{view !== 'new' && <button className="toolbar-icon" onClick={refreshDiscussions} disabled={loading} title="Refresh" aria-label="Refresh"><RefreshCw size={16} className={loading ? 'spinning' : ''} /></button>}{view === 'list' && <button className="secondary-button" onClick={() => setView('new')}><Plus size={16} />New discussion</button>}{view !== 'list' && <button className="secondary-button" onClick={() => setView('list')}><ArrowLeft size={16} />Back to discussions</button>}</div></div>
+    <div className="page-heading"><div><span className="eyebrow">Discussions</span><h1>Join the conversation.</h1><p>Browse ideas and questions from the TrackAlign community.</p></div><div className="page-heading-actions"><button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button>{view !== 'new' && <button className="toolbar-icon" onClick={refreshDiscussions} disabled={loading} title="Refresh" aria-label="Refresh"><RefreshCw size={16} className={loading ? 'spinning' : ''} /></button>}{view === 'list' && <button className="secondary-button" onClick={() => setView('new')}><Plus size={16} />New discussion</button>}{view !== 'list' && <button className="secondary-button" onClick={() => setView('list')}><ArrowLeft size={16} />Back to discussions</button>}</div></div>
     {error && <p className="source-error" role="alert">{error}</p>}
     {view === 'list' && <>
       <div className="category-filters">

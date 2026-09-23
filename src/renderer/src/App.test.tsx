@@ -162,6 +162,19 @@ describe('App shell', () => {
     expect(await screen.findByRole('button', { name: /connect github/i })).toBeInTheDocument()
   })
 
+  it('opens the Help panel with a Discussions section from the Discussions page', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'Discussions' }))
+    await user.click(screen.getByRole('button', { name: 'Help' }))
+    const helpPanel = screen.getByRole('complementary', { name: 'Contextual help' })
+    expect(within(helpPanel).getByRole('heading', { name: /how trackalign works/i })).toBeInTheDocument()
+
+    await user.click(within(helpPanel).getByRole('button', { name: 'Discussions' }))
+    expect(within(helpPanel).getByText(/browse, start, and reply to trackalign discussions/i)).toBeInTheDocument()
+  })
+
   it('opens the Report an issue slideout from the More menu with a GitHub connect prompt', async () => {
     const user = userEvent.setup()
     render(<App />)
