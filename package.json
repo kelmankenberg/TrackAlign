@@ -1,6 +1,7 @@
 {
   "name": "trackalign",
   "version": "0.1.0",
+  "desktopName": "TrackAlign",
   "description": "Match local audio files to Spotify collection order and rename them safely.",
   "main": "out/main/index.js",
   "type": "module",
@@ -53,7 +54,8 @@
       ],
       "category": "AudioVideo",
       "maintainer": "TrackAlign",
-      "icon": "build/icon.png"
+      "icon": "build/icons-linux",
+      "syncDesktopName": true
     },
     "win": {
       "target": [
