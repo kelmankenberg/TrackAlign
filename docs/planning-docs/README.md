@@ -38,7 +38,8 @@ TrackAlign is a desktop application that matches selected local audio files to a
 5. [Implementation Plan](implementation-plan.md)
 6. [Testing Strategy](testing-strategy.md)
 7. [Release Plan](release-plan.md)
-8. [Spotify Discovery: Browse and Search](spotify-discovery.md) (proposed, not yet implemented)
-8. [Open Questions](open-questions.md)
+8. [GitHub Release Checklist](release-checklist.md)
+9. [Spotify Discovery: Browse and Search](spotify-discovery.md) (proposed, not yet implemented)
+10. [Open Questions](open-questions.md)
 
 The open questions document should be updated as implementation reveals decisions that still need product or technical confirmation.
