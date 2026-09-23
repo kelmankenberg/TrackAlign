@@ -104,3 +104,80 @@ export async function fetchSpotifyCollection(sourceUrl: string, accessToken: str
   }))
   return { type: source.type, name: collectionName, url: sourceUrl, tracks }
 }
+
+export interface SpotifySearchResult {
+  type: SpotifySourceType
+  id: string
+  name: string
+  subtitle: string
+  imageUrl?: string
+  url: string
+  trackCount: number
+}
+
+interface RawSearchPlaylist {
+  id: string
+  name: string
+  owner?: { display_name?: string }
+  images?: Array<{ url: string }>
+  tracks?: { total?: number }
+  external_urls?: { spotify?: string }
+}
+
+interface RawSearchAlbum {
+  id: string
+  name: string
+  artists?: Array<{ name: string }>
+  images?: Array<{ url: string }>
+  total_tracks?: number
+  external_urls?: { spotify?: string }
+}
+
+export async function searchSpotify(query: string, types: SpotifySourceType[], accessToken: string, fetchImpl: FetchLike, apiBase = 'https://api.spotify.com/v1', limit = 10): Promise<SpotifySearchResult[]> {
+  const trimmed = query.trim()
+  if (!trimmed || types.length === 0) return []
+
+  const url = `${apiBase}/search?q=${encodeURIComponent(trimmed)}&type=${types.join(',')}&limit=${limit}`
+  let response: FetchResponseLike
+  try {
+    response = await fetchImpl(url, { headers: { Authorization: `Bearer ${accessToken}` } })
+  } catch (cause) {
+    throw new Error('Could not reach Spotify. Check your internet connection and try again.', { cause })
+  }
+  if (!response.ok) {
+    const body = await response.json().catch(() => null) as { error?: { message?: string } } | null
+    throw new Error(describeSpotifyApiError(response.status, body, types[0]))
+  }
+
+  const payload = await response.json() as {
+    playlists?: { items: Array<RawSearchPlaylist | null> }
+    albums?: { items: Array<RawSearchAlbum | null> }
+  }
+
+  const results: SpotifySearchResult[] = []
+  for (const item of payload.playlists?.items ?? []) {
+    if (!item) continue
+    results.push({
+      type: 'playlist',
+      id: item.id,
+      name: item.name,
+      subtitle: item.owner?.display_name ? `By ${item.owner.display_name}` : '',
+      imageUrl: item.images?.[0]?.url,
+      url: item.external_urls?.spotify ?? `https://open.spotify.com/playlist/${item.id}`,
+      trackCount: item.tracks?.total ?? 0,
+    })
+  }
+  for (const item of payload.albums?.items ?? []) {
+    if (!item) continue
+    results.push({
+      type: 'album',
+      id: item.id,
+      name: item.name,
+      subtitle: item.artists?.map((artist) => artist.name).join(', ') ?? '',
+      imageUrl: item.images?.[0]?.url,
+      url: item.external_urls?.spotify ?? `https://open.spotify.com/album/${item.id}`,
+      trackCount: item.total_tracks ?? 0,
+    })
+  }
+  return results
+}

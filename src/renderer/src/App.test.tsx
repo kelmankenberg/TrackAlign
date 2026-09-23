@@ -212,4 +212,23 @@ describe('App shell', () => {
     expect(screen.getByRole('heading', { name: /choose a folder/i })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Start over' })).not.toBeInTheDocument()
   })
+
+  it('searches Spotify and loads the selected result', async () => {
+    vi.mocked(window.trackAlign.spotify.search).mockResolvedValueOnce([
+      { type: 'playlist', id: 'p1', name: 'Road Trip Mix', subtitle: 'By Alex', url: 'https://open.spotify.com/playlist/p1', trackCount: 15 },
+    ])
+    vi.mocked(window.trackAlign.spotify.loadCollection).mockResolvedValueOnce({ type: 'playlist', name: 'Road Trip Mix', url: 'https://open.spotify.com/playlist/p1', tracks: [] })
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('heading', { name: /connect spotify/i }).closest('button')!)
+    await user.type(screen.getByRole('textbox', { name: /search spotify/i }), 'road trip')
+    await user.click(screen.getByRole('button', { name: /^search$/i }))
+
+    const result = await screen.findByRole('button', { name: /road trip mix/i })
+    await user.click(result)
+
+    expect(window.trackAlign.spotify.loadCollection).toHaveBeenCalledWith('https://open.spotify.com/playlist/p1')
+    expect((await screen.findAllByRole('heading', { name: 'Road Trip Mix' })).length).toBeGreaterThanOrEqual(1)
+  })
 })

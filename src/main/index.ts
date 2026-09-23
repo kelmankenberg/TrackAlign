@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { readFileSync, writeFileSync, existsSync, statSync, unlinkSync } from 'node:fs'
 import 'dotenv/config'
 import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
-import { fetchSpotifyCollection } from '../shared/spotify'
+import { fetchSpotifyCollection, searchSpotify, type SpotifySourceType } from '../shared/spotify'
 import { scanFolder as runScanFolder } from '../shared/folderScanner'
 import {
   requestDeviceCode,
@@ -219,6 +219,11 @@ async function ensureSpotifyAccessToken() {
 async function loadSpotifyCollection(sourceUrl: string) {
   const accessToken = await ensureSpotifyAccessToken()
   return fetchSpotifyCollection(sourceUrl, accessToken, fetch, spotifyApiBase)
+}
+
+async function searchSpotifyCollections(query: string, types: SpotifySourceType[]) {
+  const accessToken = await ensureSpotifyAccessToken()
+  return searchSpotify(query, types, accessToken, fetch, spotifyApiBase)
 }
 
 function signOutSpotify() {
@@ -492,6 +497,7 @@ app.whenReady().then(() => {
   ipcMain.handle('rename:undo-latest', undoLatestRename)
   ipcMain.handle('spotify:authenticate', startSpotifyAuth)
   ipcMain.handle('spotify:load-collection', (_event, sourceUrl: string) => loadSpotifyCollection(sourceUrl))
+  ipcMain.handle('spotify:search', (_event, query: string, types: SpotifySourceType[]) => searchSpotifyCollections(query, types))
   ipcMain.handle('spotify:sign-out', () => signOutSpotify())
   ipcMain.handle('spotify:status', () => spotifyStatus())
   ipcMain.handle('github:auth-start', (event) => startGithubDeviceAuth(event.sender))

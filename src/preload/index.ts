@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('trackAlign', {
   spotify: {
     authenticate: () => ipcRenderer.invoke('spotify:authenticate'),
     loadCollection: (sourceUrl: string) => ipcRenderer.invoke('spotify:load-collection', sourceUrl),
+    search: (query: string, types: Array<'playlist' | 'album'>) => ipcRenderer.invoke('spotify:search', query, types),
     signOut: () => ipcRenderer.invoke('spotify:sign-out'),
     status: () => ipcRenderer.invoke('spotify:status'),
   },

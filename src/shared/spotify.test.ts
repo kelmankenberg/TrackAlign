@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseSpotifySource, describeSpotifyApiError, fetchSpotifyCollection, type FetchLike, type FetchResponseLike } from './spotify'
+import { parseSpotifySource, describeSpotifyApiError, fetchSpotifyCollection, searchSpotify, type FetchLike, type FetchResponseLike } from './spotify'
 
 function jsonResponse(status: number, body: unknown, headers: Record<string, string> = {}): FetchResponseLike {
   return {
@@ -101,5 +101,41 @@ describe('fetchSpotifyCollection', () => {
     }
 
     await expect(fetchSpotifyCollection('https://open.spotify.com/playlist/offline', 'token', fetchImpl)).rejects.toThrow(/internet connection/)
+  })
+})
+
+describe('searchSpotify', () => {
+  it('returns an empty array for a blank query without making a request', async () => {
+    let called = false
+    const fetchImpl: FetchLike = async () => { called = true; return jsonResponse(200, {}) }
+    const results = await searchSpotify('   ', ['playlist', 'album'], 'token', fetchImpl)
+    expect(results).toEqual([])
+    expect(called).toBe(false)
+  })
+
+  it('maps playlist and album results into a unified shape', async () => {
+    const fetchImpl: FetchLike = async (url) => {
+      expect(url).toContain('type=playlist,album')
+      return jsonResponse(200, {
+        playlists: { items: [{ id: 'p1', name: 'Road Trip', owner: { display_name: 'Alex' }, images: [{ url: 'https://img/p1.jpg' }], tracks: { total: 20 }, external_urls: { spotify: 'https://open.spotify.com/playlist/p1' } }] },
+        albums: { items: [{ id: 'a1', name: 'Great Album', artists: [{ name: 'Artist' }], images: [{ url: 'https://img/a1.jpg' }], total_tracks: 12, external_urls: { spotify: 'https://open.spotify.com/album/a1' } }] },
+      })
+    }
+
+    const results = await searchSpotify('road trip', ['playlist', 'album'], 'token', fetchImpl)
+    expect(results).toEqual([
+      { type: 'playlist', id: 'p1', name: 'Road Trip', subtitle: 'By Alex', imageUrl: 'https://img/p1.jpg', url: 'https://open.spotify.com/playlist/p1', trackCount: 20 },
+      { type: 'album', id: 'a1', name: 'Great Album', subtitle: 'Artist', imageUrl: 'https://img/a1.jpg', url: 'https://open.spotify.com/album/a1', trackCount: 12 },
+    ])
+  })
+
+  it('skips null entries returned by the API', async () => {
+    const fetchImpl: FetchLike = async () => jsonResponse(200, { playlists: { items: [null] }, albums: { items: [null] } })
+    await expect(searchSpotify('anything', ['playlist', 'album'], 'token', fetchImpl)).resolves.toEqual([])
+  })
+
+  it('throws a descriptive error on failure', async () => {
+    const fetchImpl: FetchLike = async () => jsonResponse(401, { error: { message: 'Invalid token' } })
+    await expect(searchSpotify('anything', ['playlist'], 'token', fetchImpl)).rejects.toThrow(/Invalid token/)
   })
 })

@@ -19,6 +19,7 @@ if (typeof window !== 'undefined') {
       spotify: {
         authenticate: vi.fn().mockResolvedValue({ authenticated: true }),
         loadCollection: vi.fn().mockResolvedValue({ type: 'playlist', name: 'Mock Playlist', url: '', tracks: [] }),
+        search: vi.fn().mockResolvedValue([]),
         signOut: vi.fn().mockResolvedValue({ signedOut: true }),
         status: vi.fn().mockResolvedValue({ connected: false }),
       },
