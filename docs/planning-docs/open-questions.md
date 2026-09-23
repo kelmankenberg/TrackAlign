@@ -24,12 +24,12 @@ This document contains active decisions that still need confirmation. Resolved d
 - Symbolic links are ignored by default and reported in the folder inventory summary.
 - Spotify access uses OAuth with PKCE. Users authorize TrackAlign in Spotify; they do not provide their Spotify password or developer secret to the app.
 - Development supplies the Spotify client ID and redirect URI through local environment/configuration excluded from Git. Packaged builds include the public client ID and use registered platform-specific redirect URIs; no client secret is shipped.
+- Spotify Discovery browse uses a native "Your library" list built from the Spotify Web API (not an embedded Spotify web UI/webview) — avoids a second, separate sign-in and extra security hardening.
+- The native browse list covers both playlists and saved albums (adds the `user-library-read` scope).
+- Search covers both playlists and albums by default, with a toggle matching the existing Load dialog tabs.
+- Search ships first as a standalone improvement; native library browse follows afterward.
 
 ## Remaining Decisions
 
 - Spotify Discovery (browse/search) proposal — see [spotify-discovery.md](spotify-discovery.md) for full detail. Open items:
-  - Should the native "browse your library" view cover playlists only, or also saved albums (requires adding the `user-library-read` scope)?
-  - Should search cover playlists, albums, or both by default?
   - Should search results be a short fixed list, or support pagination?
-  - Is the embedded-Spotify-web-UI browsing approach (vs. a native API-driven library list) still wanted, given its extra complexity and the need for a second, separate Spotify sign-in?
-  - Build order: search first as a standalone improvement, or search and native library browse together as one slideout?

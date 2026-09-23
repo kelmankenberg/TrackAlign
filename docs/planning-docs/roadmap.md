@@ -56,6 +56,8 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Document and surface the Spotify platform restriction on algorithmic/personalized playlists (in-app Help and error messages).
 - [x] Preserve playlist positions and duplicate playlist occurrences (unit-tested in `src/shared/spotify.test.ts`).
 - [x] Provide playlist/album URL loading and ordered collection preview through the Spotify API bridge.
+- [ ] Spotify Discovery: search Spotify by name (playlists/albums) to select and load a collection without pasting a URL. See [spotify-discovery.md](spotify-discovery.md). Building first, ahead of native library browse.
+- [ ] Spotify Discovery: native "Your library" browse list (playlists and saved albums, via the Web API; adds `user-library-read` scope). See [spotify-discovery.md](spotify-discovery.md).
 
 ## Matching and Review
 

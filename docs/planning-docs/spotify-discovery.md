@@ -45,8 +45,8 @@ Replace/extend today's "Load a playlist or album" dialog with a slideout that ha
 
 ## Open questions
 
-1. **Scope for Feature A2:** Do you want both "Your playlists" *and* "Your saved albums" browsable, or just one? Saved albums require adding the `user-library-read` scope (a re-consent the next time the user connects/reconnects Spotify).
-2. **Search scope:** Should search cover playlists, albums, or both by default (with a toggle), matching the existing Playlist/Album tabs in today's dialog?
-3. **Result count/pagination:** Should search results be a fixed short list (e.g. top 10) with no pagination, or support "load more"?
-4. **Feature A1 (embedded browser):** Given the tradeoffs above, are you okay dropping this in favor of A2 + Search, or is there a specific reason you want the actual Spotify web UI embedded (e.g. discovering things via Spotify's own recommendations/browse tab that the Web API doesn't expose)?
-5. **Rollout:** Build Search (Feature B) first as a standalone, low-risk improvement, then layer in the native library browse (A2) afterward? Or build them together as one slideout from the start?
+1. ~~**Scope for Feature A2:**~~ **Resolved:** native browse covers both playlists and saved albums (adds `user-library-read`).
+2. ~~**Search scope:**~~ **Resolved:** search covers both playlists and albums by default, with a toggle matching the existing Playlist/Album tabs.
+3. **Result count/pagination:** Should search results be a fixed short list (e.g. top 10) with no pagination, or support "load more"? *(still open)*
+4. ~~**Feature A1 (embedded browser):**~~ **Resolved:** dropped in favor of the native library-list approach (A2). No embedded webview.
+5. ~~**Rollout:**~~ **Resolved:** Search ships first as a standalone improvement; native library browse (A2) follows afterward.
