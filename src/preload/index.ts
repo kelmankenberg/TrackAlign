@@ -12,9 +12,9 @@ contextBridge.exposeInMainWorld('trackAlign', {
     loadCollection: (sourceUrl: string) => ipcRenderer.invoke('spotify:load-collection', sourceUrl),
   },
   window: {
-    minimize: () => ipcRenderer.send('window:minimize'),
-    toggleMaximize: () => ipcRenderer.send('window:toggle-maximize'),
-    close: () => ipcRenderer.send('window:close'),
-    toggleDevTools: () => ipcRenderer.send('window:toggle-devtools'),
+    minimize: () => ipcRenderer.invoke('window:minimize'),
+    toggleMaximize: () => ipcRenderer.invoke('window:toggle-maximize'),
+    close: () => ipcRenderer.invoke('window:close'),
+    toggleDevTools: () => ipcRenderer.invoke('window:toggle-devtools'),
   },
 })

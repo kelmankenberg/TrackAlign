@@ -340,18 +340,26 @@ app.whenReady().then(() => {
   ipcMain.handle('rename:undo-latest', undoLatestRename)
   ipcMain.handle('spotify:authenticate', startSpotifyAuth)
   ipcMain.handle('spotify:load-collection', (_event, sourceUrl: string) => loadSpotifyCollection(sourceUrl))
-  ipcMain.on('window:minimize', (event) => BrowserWindow.fromWebContents(event.sender)?.minimize())
-  ipcMain.on('window:toggle-maximize', (event) => {
+  ipcMain.handle('window:minimize', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.minimize()
+    return true
+  })
+  ipcMain.handle('window:toggle-maximize', (event) => {
     const window = BrowserWindow.fromWebContents(event.sender)
     if (window?.isMaximized()) window.unmaximize()
     else window?.maximize()
+    return window?.isMaximized() ?? false
   })
-  ipcMain.on('window:close', (event) => BrowserWindow.fromWebContents(event.sender)?.close())
-  ipcMain.on('window:toggle-devtools', (event) => {
+  ipcMain.handle('window:close', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close()
+    return true
+  })
+  ipcMain.handle('window:toggle-devtools', (event) => {
     const window = BrowserWindow.fromWebContents(event.sender)
-    if (!window) return
+    if (!window) return false
     if (window.webContents.isDevToolsOpened()) window.webContents.closeDevTools()
     else window.webContents.openDevTools({ mode: 'detach' })
+    return true
   })
   createWindow()
 

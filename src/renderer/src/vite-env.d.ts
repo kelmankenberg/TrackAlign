@@ -38,10 +38,10 @@ interface Window {
 			loadCollection: (sourceUrl: string) => Promise<{ type: 'playlist' | 'album'; name: string; url: string; tracks: Array<{ position: number; artist: string; title: string; duration: string; durationMs?: number }> }>
 		}
 		window: {
-			minimize: () => void
-			toggleMaximize: () => void
-			close: () => void
-			toggleDevTools: () => void
+			minimize: () => Promise<boolean>
+			toggleMaximize: () => Promise<boolean>
+			close: () => Promise<boolean>
+			toggleDevTools: () => Promise<boolean>
 		}
 	}
 }
