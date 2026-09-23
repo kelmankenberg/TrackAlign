@@ -194,6 +194,21 @@ describe('App shell', () => {
     expect(await screen.findByRole('button', { name: /connect github/i })).toBeInTheDocument()
   })
 
+  it('renders the Markdown changelog as collapsible release sections', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'More options' }))
+    await user.click(screen.getByRole('button', { name: 'Changelog' }))
+
+    const panel = screen.getByRole('complementary', { name: 'Changelog' })
+    expect(within(panel).getByText(/initial trackalign desktop shell/i)).toBeInTheDocument()
+
+    await user.click(within(panel).getByRole('button', { name: /next.*planned/i }))
+    expect(within(panel).getByText(/native spotify library browsing/i)).toBeInTheDocument()
+    expect(within(panel).queryByText(/initial trackalign desktop shell/i)).not.toBeInTheDocument()
+  })
+
   it('keeps the loaded folder in Workspace after navigating to Settings and back', async () => {
     vi.mocked(window.trackAlign.inspectFolder).mockResolvedValueOnce({
       cancelled: false,

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { matchFiles, type MatchProposal } from '../../shared/matching'
 import { renderFilename } from '../../shared/filename'
+import changelogMarkdown from '../../../CHANGELOG.md?raw'
+import { parseChangelog } from './changelog'
 
 function describeError(error: unknown, fallback: string) {
   const raw = error instanceof Error ? error.message : fallback
@@ -89,10 +91,7 @@ const navModes: Array<{ id: NavMode; label: string; description: string }> = [
   { id: 'toolbar', label: 'Titlebar Nav', description: 'Navigation moved into the top toolbar' },
 ]
 
-const changelog = [
-  { version: '0.1.0', date: 'September 2026', notes: ['Initial TrackAlign shell', 'Three-state navigation layout', 'Settings, Help, and Changelog panels'] },
-  { version: 'Next', date: 'Planned', notes: ['Local audio folder inventory', 'Spotify OAuth with PKCE', 'Matching review workspace'] },
-]
+const changelog = parseChangelog(changelogMarkdown)
 
 interface HelpSection { id: string; title: string; paragraphs: string[]; tip?: string }
 
@@ -202,7 +201,7 @@ function App() {
   const [page, setPage] = useState<Page>('workspace')
   const [panel, setPanel] = useState<SidePanel>(null)
   const [moreOpen, setMoreOpen] = useState(false)
-  const [expandedChangelog, setExpandedChangelog] = useState('0.1.0')
+  const [expandedChangelog, setExpandedChangelog] = useState(changelog[0]?.version ?? '')
   const [expandedHelp, setExpandedHelp] = useState('')
   const [status, setStatus] = useState('Ready for a folder')
   const [zoomFactor, setZoomFactor] = useState(() => clampZoom(Number(localStorage.getItem('trackalign-zoom')) || 1))
