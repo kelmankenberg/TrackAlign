@@ -69,6 +69,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
   - [x] Persisted the last selected local folder, defaulting the folder picker to it (falling back to the OS default if it no longer exists).
   - [x] Persisted the Spotify connection (refresh token, encrypted at rest via OS keychain through `safeStorage`) so re-authorization isn't needed after restarting the app.
   - [x] Removed the non-functional Startup behavior setting and replaced the static Navigation layout label with real Full/Collapsed/Titlebar Nav options.
+  - [x] Added in-app GitHub integration: a "Report an issue" slideout (reachable from the More menu) that submits GitHub issues, a Discussions page for browsing/starting/replying to GitHub Discussions, and a GitHub connection row in Settings. Auth uses the OAuth Device Flow with the token encrypted at rest via `safeStorage`.
 - [x] Support manual reassignment, exclusion, and unmatched files.
 - [x] Preserve collection-position numbering gaps (unmatched/excluded tracks are simply not renamed, so no renumbering occurs).
 

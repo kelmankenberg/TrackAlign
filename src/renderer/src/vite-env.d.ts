@@ -40,6 +40,18 @@ interface Window {
 			signOut: () => Promise<{ signedOut: true }>
 			status: () => Promise<{ connected: boolean }>
 		}
+		github: {
+			authStart: () => Promise<{ userCode: string; verificationUri: string }>
+			onAuthStatus: (callback: (status: { connected: boolean; error?: string }) => void) => () => void
+			status: () => Promise<{ connected: boolean }>
+			signOut: () => Promise<{ signedOut: true }>
+			submitIssue: (title: string, body: string) => Promise<{ number: number; htmlUrl: string }>
+			listDiscussionCategories: () => Promise<Array<{ id: string; name: string; emoji: string }>>
+			listDiscussions: (options?: { categoryId?: string; after?: string }) => Promise<{ discussions: Array<{ id: string; number: number; title: string; createdAt: string; authorLogin: string; commentCount: number }>; hasNextPage: boolean; endCursor: string | null }>
+			getDiscussion: (number: number) => Promise<{ id: string; number: number; title: string; bodyHTML: string; createdAt: string; authorLogin: string; authorAvatarUrl?: string; comments: Array<{ id: string; bodyHTML: string; createdAt: string; authorLogin: string; authorAvatarUrl?: string }> }>
+			createDiscussion: (categoryId: string, title: string, body: string) => Promise<{ id: string; number: number; url: string }>
+			addDiscussionComment: (discussionId: string, body: string) => Promise<{ id: string }>
+		}
 		window: {
 			minimize: () => Promise<boolean>
 			toggleMaximize: () => Promise<boolean>
@@ -49,6 +61,9 @@ interface Window {
 		zoom: {
 			set: (factor: number) => Promise<number>
 			get: () => Promise<number>
+		}
+		shell: {
+			openExternal: (url: string) => Promise<boolean>
 		}
 	}
 }

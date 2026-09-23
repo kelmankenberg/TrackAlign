@@ -7,6 +7,16 @@ import 'dotenv/config'
 import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
 import { fetchSpotifyCollection } from '../shared/spotify'
 import { scanFolder as runScanFolder } from '../shared/folderScanner'
+import {
+  requestDeviceCode,
+  pollDeviceAuthorization,
+  createIssue,
+  listDiscussionCategories,
+  listDiscussions,
+  getDiscussion,
+  createDiscussion,
+  addDiscussionComment,
+} from '../shared/github'
 
 app.disableHardwareAcceleration()
 
@@ -270,6 +280,122 @@ async function undoLatestRename() {
   return runUndoLatestRename(historyPath())
 }
 
+const githubOwner = 'kelmankenberg'
+const githubRepo = 'TrackAlign'
+const githubScope = 'public_repo read:discussion write:discussion'
+
+function githubClientId() {
+  const clientId = process.env.GITHUB_CLIENT_ID
+  if (!clientId) throw new Error('GitHub is not configured. Copy .env.example to .env, set GITHUB_CLIENT_ID to your GitHub OAuth App client ID, then restart TrackAlign.')
+  return clientId
+}
+
+let githubSession: { accessToken: string } | null = null
+let githubHydrationAttempted = false
+let githubPollTimer: NodeJS.Timeout | undefined
+let githubPollAbort: { cancelled: boolean } | undefined
+
+function githubSessionPath() {
+  return join(app.getPath('userData'), 'github-session.bin')
+}
+
+function clearPersistedGithubSession() {
+  try {
+    if (existsSync(githubSessionPath())) unlinkSync(githubSessionPath())
+  } catch {
+    // best-effort cleanup; ignore
+  }
+}
+
+function persistGithubSession() {
+  if (!githubSession?.accessToken || !safeStorage.isEncryptionAvailable()) {
+    clearPersistedGithubSession()
+    return
+  }
+  try {
+    writeFileSync(githubSessionPath(), safeStorage.encryptString(githubSession.accessToken))
+  } catch {
+    // best-effort persistence; ignore write failures
+  }
+}
+
+function loadPersistedGithubToken(): string | undefined {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) return undefined
+    return safeStorage.decryptString(readFileSync(githubSessionPath()))
+  } catch {
+    return undefined
+  }
+}
+
+function restoreGithubSession() {
+  if (githubSession || githubHydrationAttempted) return
+  githubHydrationAttempted = true
+  const accessToken = loadPersistedGithubToken()
+  if (accessToken) githubSession = { accessToken }
+}
+
+function githubStatus() {
+  restoreGithubSession()
+  return { connected: githubSession !== null }
+}
+
+function signOutGithub() {
+  githubSession = null
+  githubHydrationAttempted = true
+  clearPersistedGithubSession()
+  return { signedOut: true as const }
+}
+
+function ensureGithubAccessToken() {
+  restoreGithubSession()
+  if (!githubSession) throw new Error('Connect GitHub before doing this. Open Settings to connect.')
+  return githubSession.accessToken
+}
+
+async function startGithubDeviceAuth(sender: Electron.WebContents) {
+  const clientId = githubClientId()
+  const device = await requestDeviceCode(clientId, githubScope, fetch)
+  await shell.openExternal(device.verificationUriComplete ?? device.verificationUri)
+
+  if (githubPollAbort) githubPollAbort.cancelled = true
+  if (githubPollTimer) clearTimeout(githubPollTimer)
+  const abortToken = { cancelled: false }
+  githubPollAbort = abortToken
+  const deadline = Date.now() + device.expiresInSeconds * 1000
+  let intervalSeconds = device.intervalSeconds
+
+  const poll = async () => {
+    if (abortToken.cancelled) return
+    if (Date.now() > deadline) {
+      sender.send('github:auth-status', { connected: false, error: 'GitHub authorization timed out.' })
+      return
+    }
+    try {
+      const result = await pollDeviceAuthorization(clientId, device.deviceCode, fetch)
+      if (abortToken.cancelled) return
+      if (result.accessToken) {
+        githubSession = { accessToken: result.accessToken }
+        githubHydrationAttempted = true
+        persistGithubSession()
+        sender.send('github:auth-status', { connected: true })
+        return
+      }
+      if (result.error === 'slow_down') intervalSeconds = result.intervalSeconds ?? intervalSeconds + 5
+      if (result.error === 'authorization_pending' || result.error === 'slow_down') {
+        githubPollTimer = setTimeout(poll, intervalSeconds * 1000)
+        return
+      }
+      sender.send('github:auth-status', { connected: false, error: result.error === 'access_denied' ? 'GitHub authorization was declined.' : 'GitHub authorization expired. Try connecting again.' })
+    } catch (error) {
+      if (!abortToken.cancelled) sender.send('github:auth-status', { connected: false, error: error instanceof Error ? error.message : 'GitHub authorization failed.' })
+    }
+  }
+
+  githubPollTimer = setTimeout(poll, intervalSeconds * 1000)
+  return { userCode: device.userCode, verificationUri: device.verificationUriComplete ?? device.verificationUri }
+}
+
 interface WindowState {
   width: number
   height: number
@@ -368,6 +494,20 @@ app.whenReady().then(() => {
   ipcMain.handle('spotify:load-collection', (_event, sourceUrl: string) => loadSpotifyCollection(sourceUrl))
   ipcMain.handle('spotify:sign-out', () => signOutSpotify())
   ipcMain.handle('spotify:status', () => spotifyStatus())
+  ipcMain.handle('github:auth-start', (event) => startGithubDeviceAuth(event.sender))
+  ipcMain.handle('github:status', () => githubStatus())
+  ipcMain.handle('github:sign-out', () => signOutGithub())
+  ipcMain.handle('github:submit-issue', (_event, title: string, body: string) => createIssue(githubOwner, githubRepo, title, body, ensureGithubAccessToken(), fetch))
+  ipcMain.handle('github:list-discussion-categories', () => listDiscussionCategories(githubOwner, githubRepo, ensureGithubAccessToken(), fetch))
+  ipcMain.handle('github:list-discussions', (_event, options: { categoryId?: string; after?: string } = {}) => listDiscussions(githubOwner, githubRepo, ensureGithubAccessToken(), fetch, options))
+  ipcMain.handle('github:get-discussion', (_event, number: number) => getDiscussion(githubOwner, githubRepo, number, ensureGithubAccessToken(), fetch))
+  ipcMain.handle('github:create-discussion', (_event, categoryId: string, title: string, body: string) => createDiscussion(githubOwner, githubRepo, categoryId, title, body, ensureGithubAccessToken(), fetch))
+  ipcMain.handle('github:add-discussion-comment', (_event, discussionId: string, body: string) => addDiscussionComment(discussionId, body, ensureGithubAccessToken(), fetch))
+  ipcMain.handle('shell:open-external', (_event, url: string) => {
+    const parsed = new URL(url)
+    if (parsed.protocol !== 'https:' || parsed.hostname !== 'github.com') throw new Error('Only github.com links can be opened.')
+    return shell.openExternal(url).then(() => true)
+  })
   ipcMain.handle('window:minimize', (event) => {
     BrowserWindow.fromWebContents(event.sender)?.minimize()
     return true

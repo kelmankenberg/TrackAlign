@@ -24,12 +24,16 @@ TrackAlign is a desktop application that matches selected local audio files to a
    SPOTIFY_CLIENT_ID=your-client-id-here
    SPOTIFY_REDIRECT_URI=http://127.0.0.1:43821/callback
    ```
-5. Start the app:
+5. (Optional) Register a GitHub OAuth App to enable in-app issue reporting and Discussions (see [GitHub setup](#github-setup) below), and add its client ID to `.env`:
+   ```
+   GITHUB_CLIENT_ID=your-github-oauth-app-client-id
+   ```
+6. Start the app:
    ```
    npm run dev
    ```
 
-`.env` is excluded from Git and never committed. No Spotify client secret is needed — TrackAlign uses OAuth with PKCE.
+`.env` is excluded from Git and never committed. No Spotify or GitHub client secret is needed — TrackAlign uses OAuth with PKCE for Spotify and the OAuth Device Flow for GitHub.
 
 ## Spotify setup
 
@@ -46,6 +50,18 @@ TrackAlign is a desktop application that matches selected local audio files to a
 
 This client ID is bundled by whoever distributes the packaged app — end users of a released build will not need to do this themselves. It's only required for local development right now, since packaging with a shared public client ID isn't set up yet.
 
+## GitHub setup
+
+This is only needed if you want to use the in-app **Report an issue** slideout or **Discussions** page during local development.
+
+1. Go to https://github.com/settings/developers and click **New OAuth App**.
+2. Fill in:
+   - **Application name**: anything, e.g. `TrackAlign`
+   - **Homepage URL**: `https://github.com/kelmankenberg/TrackAlign`
+   - **Redirect URIs** (sometimes labeled **Authorization callback URL**): any valid URL, e.g. `https://github.com/kelmankenberg/TrackAlign` — this field isn't used at runtime since TrackAlign authenticates with the OAuth Device Flow.
+3. Click **Register application**, then copy the **Client ID** shown on the app's page.
+4. Paste that value into `.env` as `GITHUB_CLIENT_ID`. No client secret is needed.
+
 ## Using TrackAlign
 
 1. **Choose a folder** — TrackAlign lists supported audio files (`.mp3`, `.flac`, `.ogg`, `.m4a`), with hidden files and read-only files clearly marked. Use the refresh button to rescan the folder if you add files while the app is open.
@@ -54,6 +70,8 @@ This client ID is bundled by whoever distributes the packaged app — end users 
 4. **Customize the rename template** in Settings — build filenames from track number, artist, album, title, and year.
 5. **Apply rename** — files are renamed safely; existing files are never overwritten (a numbered suffix is used instead).
 6. **Undo** — the most recent rename operation can be undone from the review screen.
+7. **Report an issue** — open it from the toolbar's **More options** menu. Connect your GitHub account once (via a short device code, no browser sign-in form to fill out) and submit bugs or suggestions as GitHub issues without leaving TrackAlign.
+8. **Discussions** — browse, start, and reply to GitHub Discussions for the project from the Discussions page in the navigation rail.
 
 ## Troubleshooting
 
@@ -62,6 +80,9 @@ Copy `.env.example` to `.env` and set `SPOTIFY_CLIENT_ID` as described above, th
 
 **A Spotify playlist fails to load with a `403` error**
 Spotify blocks third-party API access to algorithmic/personalized playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You), regardless of account or app. Albums and playlists you create yourself are unaffected — try one of those instead.
+
+**"GitHub is not configured"**
+Copy `.env.example` to `.env` and set `GITHUB_CLIENT_ID` as described in [GitHub setup](#github-setup), then restart the app. This is only needed for the optional Report an issue / Discussions feature.
 
 **Electron crashes with a GPU process error on Linux**
 Hardware acceleration is disabled by default to avoid this in constrained environments. If you still see GPU errors, try running with `ELECTRON_DISABLE_GPU=1 npm run dev`.

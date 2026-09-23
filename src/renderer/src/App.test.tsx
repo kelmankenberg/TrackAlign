@@ -152,4 +152,24 @@ describe('App shell', () => {
     await user.click(screen.getByRole('button', { name: 'Expand local files' }))
     expect(await screen.findAllByText('One.mp3')).toHaveLength(2)
   })
+
+  it('navigates to Discussions and shows a GitHub connect prompt when not connected', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'Discussions' }))
+    expect(screen.getByRole('heading', { name: /join the conversation/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /connect github/i })).toBeInTheDocument()
+  })
+
+  it('opens the Report an issue slideout from the More menu with a GitHub connect prompt', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'More options' }))
+    await user.click(screen.getByRole('button', { name: 'Report an issue' }))
+
+    expect(screen.getByRole('heading', { name: /report an issue/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /connect github/i })).toBeInTheDocument()
+  })
 })
