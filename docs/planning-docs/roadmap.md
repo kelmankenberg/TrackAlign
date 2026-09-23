@@ -75,6 +75,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
   - [x] Added in-app GitHub integration: a "Report an issue" slideout (reachable from the More menu) that submits GitHub issues, a Discussions page for browsing/starting/replying to GitHub Discussions, and a GitHub connection row in Settings. Auth uses the OAuth Device Flow with the token encrypted at rest via `safeStorage`.
   - [x] Kept Workspace, Discussions, and Settings mounted at all times (toggled via inline `display: none`) so the loaded folder and Spotify collection survive navigating to another page and back, for the lifetime of the running app.
   - [x] Added a "Start over" button to the Workspace page (shown once a folder or Spotify collection is loaded) that clears the loaded folder, collection, selections, and manual matches so the user can begin fresh.
+  - [x] Show collection tracks with no matching local file as a distinctly highlighted "missing" row in the same review table, resolvable by assigning an unmatched local file to it directly from that row.
 - [x] Support manual reassignment, exclusion, and unmatched files.
 - [x] Preserve collection-position numbering gaps (unmatched/excluded tracks are simply not renamed, so no renumbering occurs).
 
