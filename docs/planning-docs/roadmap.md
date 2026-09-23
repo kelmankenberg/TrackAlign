@@ -87,7 +87,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
   - [ ] IPC boundary tests (renderer ↔ main) and packaged OAuth callback tests.
 - [ ] Add UI and accessibility tests for the shell and primary workflow.
 - [ ] Run packaged smoke tests on Linux and Windows.
-- [ ] Prepare user setup, OAuth, troubleshooting, and release documentation.
+- [x] Prepare user setup, OAuth, troubleshooting, and release documentation (see project [README.md](../../README.md)).
 
 ## Current Slice
 
