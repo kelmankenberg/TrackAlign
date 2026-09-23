@@ -94,4 +94,12 @@ describe('fetchSpotifyCollection', () => {
 
     await expect(fetchSpotifyCollection('https://open.spotify.com/playlist/dw', 'token', fetchImpl)).rejects.toThrow(/algorithmic playlists/)
   })
+
+  it('gives a distinct message when the network itself is unreachable', async () => {
+    const fetchImpl: FetchLike = async () => {
+      throw new TypeError('fetch failed')
+    }
+
+    await expect(fetchSpotifyCollection('https://open.spotify.com/playlist/offline', 'token', fetchImpl)).rejects.toThrow(/internet connection/)
+  })
 })

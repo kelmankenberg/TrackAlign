@@ -58,11 +58,19 @@ export async function fetchSpotifyCollection(sourceUrl: string, accessToken: str
   let endpoint: string | null = source.type === 'playlist' ? `${apiBase}/playlists/${source.id}/tracks?limit=50` : `${apiBase}/albums/${source.id}/tracks?limit=50`
   const sourceTracks: RawSpotifyTrack[] = []
 
+  async function fetchOrExplainNetworkError(url: string) {
+    try {
+      return await fetchImpl(url, { headers: { Authorization: `Bearer ${accessToken}` } })
+    } catch (cause) {
+      throw new Error('Could not reach Spotify. Check your internet connection and try again.', { cause })
+    }
+  }
+
   let collectionName = source.type === 'playlist' ? 'Spotify playlist' : 'Spotify album'
   let albumName = ''
   let albumYear: number | null = null
   const metaEndpoint = source.type === 'album' ? `${apiBase}/albums/${source.id}` : `${apiBase}/playlists/${source.id}?fields=name`
-  const metaResponse = await fetchImpl(metaEndpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
+  const metaResponse = await fetchOrExplainNetworkError(metaEndpoint)
   if (metaResponse.ok) {
     const metaPayload = await metaResponse.json() as { name?: string; release_date?: string }
     if (metaPayload.name) collectionName = metaPayload.name
@@ -73,7 +81,7 @@ export async function fetchSpotifyCollection(sourceUrl: string, accessToken: str
   }
 
   while (endpoint) {
-    const response = await fetchImpl(endpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
+    const response = await fetchOrExplainNetworkError(endpoint)
     if (!response.ok) {
       const body = await response.json().catch(() => null) as { error?: { message?: string } } | null
       const retryAfterHeader = response.headers.get('Retry-After')

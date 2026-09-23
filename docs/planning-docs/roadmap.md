@@ -49,7 +49,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Keep access and refresh tokens in the main process and refresh access tokens when needed.
 - [x] Reuse an existing Spotify session across collection loads instead of re-authorizing every time.
 - [x] Implement sign-out and a connection-status indicator; surface rate-limit (429, with Retry-After) and API error detail in load failures.
-  - [ ] Explicit missing-scope and network-offline UI states (currently covered by generic error messaging only).
+  - [ ] Explicit missing-scope UI state (network-offline detection is now implemented and tested).
 - [x] Load public and authorized private/collaborative playlists through the Spotify API bridge.
 - [x] Load albums and preserve album track order through the Spotify API bridge.
 - [x] Document and surface the Spotify platform restriction on algorithmic/personalized playlists (in-app Help and error messages).
