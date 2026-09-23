@@ -1,8 +1,8 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, screen, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, safeStorage, screen, shell } from 'electron'
 import { createServer } from 'node:http'
 import { randomBytes, createHash } from 'node:crypto'
 import { join } from 'node:path'
-import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, statSync, unlinkSync } from 'node:fs'
 import 'dotenv/config'
 import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
 import { fetchSpotifyCollection } from '../shared/spotify'
@@ -50,6 +50,65 @@ async function exchangeSpotifyCode(code: string, verifier: string, redirectUri: 
   if (!response.ok) throw new Error(`Spotify authorization failed (${response.status}). Check the redirect URI and app configuration.`)
   const token = await response.json() as { access_token: string; refresh_token?: string; expires_in: number }
   spotifySession = { accessToken: token.access_token, refreshToken: token.refresh_token, expiresAt: Date.now() + token.expires_in * 1000 }
+  persistSpotifySession()
+}
+
+function spotifySessionPath() {
+  return join(app.getPath('userData'), 'spotify-session.bin')
+}
+
+function persistSpotifySession() {
+  if (!spotifySession?.refreshToken || !safeStorage.isEncryptionAvailable()) {
+    clearPersistedSpotifySession()
+    return
+  }
+  try {
+    writeFileSync(spotifySessionPath(), safeStorage.encryptString(spotifySession.refreshToken))
+  } catch {
+    // best-effort persistence; ignore write failures
+  }
+}
+
+function loadPersistedRefreshToken(): string | undefined {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) return undefined
+    return safeStorage.decryptString(readFileSync(spotifySessionPath()))
+  } catch {
+    return undefined
+  }
+}
+
+function clearPersistedSpotifySession() {
+  try {
+    if (existsSync(spotifySessionPath())) unlinkSync(spotifySessionPath())
+  } catch {
+    // best-effort cleanup; ignore
+  }
+}
+
+let spotifyHydrationAttempted = false
+
+async function restoreSpotifySession() {
+  if (spotifySession || spotifyHydrationAttempted) return
+  spotifyHydrationAttempted = true
+  const refreshToken = loadPersistedRefreshToken()
+  if (!refreshToken) return
+  try {
+    const response = await fetch(spotifyTokenEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: spotifyClientId(), grant_type: 'refresh_token', refresh_token: refreshToken }),
+    })
+    if (!response.ok) {
+      clearPersistedSpotifySession()
+      return
+    }
+    const token = await response.json() as { access_token: string; refresh_token?: string; expires_in: number }
+    spotifySession = { accessToken: token.access_token, refreshToken: token.refresh_token ?? refreshToken, expiresAt: Date.now() + token.expires_in * 1000 }
+    persistSpotifySession()
+  } catch {
+    clearPersistedSpotifySession()
+  }
 }
 
 async function startSpotifyAuth() {
@@ -117,6 +176,7 @@ async function startSpotifyAuth() {
 }
 
 async function getSpotifyAccessToken() {
+  await restoreSpotifySession()
   if (!spotifySession) throw new Error('Connect Spotify before loading a collection.')
   if (spotifySession.expiresAt > Date.now() + 30_000) return spotifySession.accessToken
   if (!spotifySession.refreshToken) throw new Error('Spotify authorization expired. Connect again.')
@@ -128,10 +188,12 @@ async function getSpotifyAccessToken() {
   })
   if (!response.ok) {
     spotifySession = null
+    clearPersistedSpotifySession()
     throw new Error('Spotify authorization expired. Connect again.')
   }
   const token = await response.json() as { access_token: string; refresh_token?: string; expires_in: number }
   spotifySession = { accessToken: token.access_token, refreshToken: token.refresh_token ?? spotifySession.refreshToken, expiresAt: Date.now() + token.expires_in * 1000 }
+  persistSpotifySession()
   return spotifySession.accessToken
 }
 
@@ -151,10 +213,13 @@ async function loadSpotifyCollection(sourceUrl: string) {
 
 function signOutSpotify() {
   spotifySession = null
+  spotifyHydrationAttempted = true
+  clearPersistedSpotifySession()
   return { signedOut: true as const }
 }
 
-function spotifyStatus() {
+async function spotifyStatus() {
+  await restoreSpotifySession()
   return { connected: spotifySession !== null }
 }
 
