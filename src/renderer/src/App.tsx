@@ -70,6 +70,12 @@ const navItems: Array<{ id: Page; label: string; icon: typeof LayoutDashboard }>
   { id: 'settings', label: 'Settings', icon: Settings },
 ]
 
+const navModes: Array<{ id: NavMode; label: string; description: string }> = [
+  { id: 'expanded', label: 'Full Nav', description: 'Side rail with icons and labels' },
+  { id: 'iconOnly', label: 'Collapsed Nav', description: 'Icon-only side rail' },
+  { id: 'toolbar', label: 'Titlebar Nav', description: 'Navigation moved into the top toolbar' },
+]
+
 const changelog = [
   { version: '0.1.0', date: 'September 2026', notes: ['Initial TrackAlign shell', 'Three-state navigation layout', 'Settings, Help, and Changelog panels'] },
   { version: 'Next', date: 'Planned', notes: ['Local audio folder inventory', 'Spotify OAuth with PKCE', 'Matching review workspace'] },
@@ -135,6 +141,10 @@ function App() {
 
   const cycleNavMode = () => {
     const nextMode: NavMode = navMode === 'expanded' ? 'iconOnly' : navMode === 'iconOnly' ? 'toolbar' : 'expanded'
+    setAppNavMode(nextMode)
+  }
+
+  const setAppNavMode = (nextMode: NavMode) => {
     setNavMode(nextMode)
     localStorage.setItem('trackalign-nav-mode', nextMode)
   }
@@ -195,7 +205,7 @@ function App() {
       <div className="app-body">
         {navMode !== 'toolbar' && <aside className={`nav-rail ${navMode === 'iconOnly' ? 'icon-only' : ''}`} aria-label="Primary navigation">{renderNavItems(navMode === 'expanded')}</aside>}
         <main className="page-content">
-          {page === 'workspace' ? <Workspace onHelp={() => setPanel('help')} onStatusChange={setStatus} renameTemplate={renameTemplate} /> : <SettingsPage onHelp={() => setPanel('help')} theme={theme} onThemeChange={setAppTheme} renameTemplate={renameTemplate} onRenameTemplateChange={setAppRenameTemplate} />}
+          {page === 'workspace' ? <Workspace onHelp={() => setPanel('help')} onStatusChange={setStatus} renameTemplate={renameTemplate} /> : <SettingsPage onHelp={() => setPanel('help')} theme={theme} onThemeChange={setAppTheme} renameTemplate={renameTemplate} onRenameTemplateChange={setAppRenameTemplate} navMode={navMode} onNavModeChange={setAppNavMode} />}
         </main>
         {panel && <aside className="side-panel" aria-label={panel === 'help' ? 'Contextual help' : 'Changelog'}>
           <div className="panel-header">
@@ -355,7 +365,7 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
   </section>
 }
 
-function SettingsPage({ onHelp, theme, onThemeChange, renameTemplate, onRenameTemplateChange }: { onHelp: () => void; theme: Theme; onThemeChange: (theme: Theme) => void; renameTemplate: string; onRenameTemplateChange: (template: string) => void }) {
+function SettingsPage({ onHelp, theme, onThemeChange, renameTemplate, onRenameTemplateChange, navMode, onNavModeChange }: { onHelp: () => void; theme: Theme; onThemeChange: (theme: Theme) => void; renameTemplate: string; onRenameTemplateChange: (template: string) => void; navMode: NavMode; onNavModeChange: (mode: NavMode) => void }) {
   const [spotifyConnected, setSpotifyConnected] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -369,7 +379,7 @@ function SettingsPage({ onHelp, theme, onThemeChange, renameTemplate, onRenameTe
 
   return <section className="settings-page">
     <div className="page-heading"><div><span className="eyebrow">Preferences</span><h1>Settings</h1><p>Make TrackAlign fit the way you organize music.</p></div><button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button></div>
-    <div className="settings-list"><div className="setting-row template-row"><div className="setting-icon"><SlidersHorizontal size={18} /></div><div><h2>Rename template</h2><p>Choose the fields that shape expected filenames.</p><div className="template-input-row"><div className="template-input-wrap"><input className="template-input" value={renameTemplate} onChange={(event) => onRenameTemplateChange(event.target.value)} aria-label="Rename template" />{renameTemplate && <button type="button" className="template-clear" onClick={() => onRenameTemplateChange('')} title="Clear template" aria-label="Clear template"><X size={14} /></button>}</div><button type="button" className="ghost-button" onClick={() => onRenameTemplateChange('{trackNumber} - {artist} - {title}')} title="Reset to default template" aria-label="Reset to default template"><RotateCcw size={14} />Default</button></div><div className="template-tokens">{['{trackNumber}', '{artist}', '{album}', '{title}', '{year}'].map((token) => <button key={token} onClick={() => onRenameTemplateChange(`${renameTemplate}${renameTemplate ? ' - ' : ''}${token}`)}>{token}</button>)}</div></div></div><div className="setting-row"><div className="setting-icon"><Menu size={18} /></div><div><h2>Navigation layout</h2><p>Your preferred rail state is remembered between launches.</p></div><span className="setting-value">Automatic</span></div><div className="setting-row appearance-row"><div className="setting-icon">{isDarkTheme(theme) ? <Moon size={18} /> : <Sun size={18} />}</div><div><h2>Appearance</h2><p>Choose a light or dark workspace and keep the choice between launches.</p><div className="theme-groups"><div><span className="theme-group-label">Light</span><div className="theme-options">{lightThemes.map((option) => <button key={option.id} className={`theme-option ${theme === option.id ? 'selected' : ''}`} onClick={() => onThemeChange(option.id)} title={option.description}><Sun size={13} />{option.label}</button>)}</div></div><div><span className="theme-group-label">Dark</span><div className="theme-options">{darkThemes.map((option) => <button key={option.id} className={`theme-option ${theme === option.id ? 'selected' : ''}`} onClick={() => onThemeChange(option.id)} title={option.description}><Moon size={13} />{option.label}</button>)}</div></div></div></div></div><div className="setting-row"><div className="setting-icon"><ListMusic size={18} /></div><div><h2>Spotify connection</h2><p>{spotifyConnected === null ? 'Checking connection…' : spotifyConnected ? 'Connected. Your session is reused for future collection loads.' : 'Not connected. Connect from the Workspace page.'}</p></div>{spotifyConnected && <button className="ghost-button" onClick={handleSignOut}>Disconnect</button>}</div></div>
+    <div className="settings-list"><div className="setting-row template-row"><div className="setting-icon"><SlidersHorizontal size={18} /></div><div><h2>Rename template</h2><p>Choose the fields that shape expected filenames.</p><div className="template-input-row"><div className="template-input-wrap"><input className="template-input" value={renameTemplate} onChange={(event) => onRenameTemplateChange(event.target.value)} aria-label="Rename template" />{renameTemplate && <button type="button" className="template-clear" onClick={() => onRenameTemplateChange('')} title="Clear template" aria-label="Clear template"><X size={14} /></button>}</div><button type="button" className="ghost-button" onClick={() => onRenameTemplateChange('{trackNumber} - {artist} - {title}')} title="Reset to default template" aria-label="Reset to default template"><RotateCcw size={14} />Default</button></div><div className="template-tokens">{['{trackNumber}', '{artist}', '{album}', '{title}', '{year}'].map((token) => <button key={token} onClick={() => onRenameTemplateChange(`${renameTemplate}${renameTemplate ? ' - ' : ''}${token}`)}>{token}</button>)}</div></div></div><div className="setting-row"><div className="setting-icon"><Menu size={18} /></div><div><h2>Navigation layout</h2><p>Your preferred rail state is remembered between launches.</p><div className="theme-options">{navModes.map((option) => <button key={option.id} className={`theme-option ${navMode === option.id ? 'selected' : ''}`} onClick={() => onNavModeChange(option.id)} title={option.description}><Menu size={13} />{option.label}</button>)}</div></div></div><div className="setting-row appearance-row"><div className="setting-icon">{isDarkTheme(theme) ? <Moon size={18} /> : <Sun size={18} />}</div><div><h2>Appearance</h2><p>Choose a light or dark workspace and keep the choice between launches.</p><div className="theme-groups"><div><span className="theme-group-label">Light</span><div className="theme-options">{lightThemes.map((option) => <button key={option.id} className={`theme-option ${theme === option.id ? 'selected' : ''}`} onClick={() => onThemeChange(option.id)} title={option.description}><Sun size={13} />{option.label}</button>)}</div></div><div><span className="theme-group-label">Dark</span><div className="theme-options">{darkThemes.map((option) => <button key={option.id} className={`theme-option ${theme === option.id ? 'selected' : ''}`} onClick={() => onThemeChange(option.id)} title={option.description}><Moon size={13} />{option.label}</button>)}</div></div></div></div></div><div className="setting-row"><div className="setting-icon"><ListMusic size={18} /></div><div><h2>Spotify connection</h2><p>{spotifyConnected === null ? 'Checking connection…' : spotifyConnected ? 'Connected. Your session is reused for future collection loads.' : 'Not connected. Connect from the Workspace page.'}</p></div>{spotifyConnected && <button className="ghost-button" onClick={handleSignOut}>Disconnect</button>}</div></div>
   </section>
 }
 
