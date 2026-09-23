@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { matchFiles, type MatchProposal } from '../../shared/matching'
 import { renderFilename } from '../../shared/filename'
+
+function describeError(error: unknown, fallback: string) {
+  const raw = error instanceof Error ? error.message : fallback
+  return raw.replace(/^Error invoking remote method '[^']*':\s*(Error:\s*)?/, '')
+}
 import {
   ChevronDown,
   CircleHelp,
@@ -86,7 +91,7 @@ function App() {
       if (result === false) setStatus(`${label} could not be completed`)
     } catch (error) {
       console.error(`TrackAlign window command failed: ${label}`, error)
-      setStatus(error instanceof Error ? error.message : `${label} could not be completed`)
+      setStatus(describeError(error, `${label} could not be completed`))
     }
   }
 
@@ -203,7 +208,7 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
         onStatusChange('Ready for a folder')
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Could not inspect that folder'
+      const message = describeError(error, 'Could not inspect that folder')
       console.error('TrackAlign folder inspection failed', error)
       onStatusChange(message)
     } finally {
@@ -237,7 +242,7 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
       setSourceOpen(false)
       onStatusChange(`${nextCollection.name} loaded · ${nextCollection.tracks.length} tracks`)
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Spotify could not be connected.'
+      const message = describeError(error, 'Spotify could not be connected.')
       setSourceError(message)
       onStatusChange('Spotify connection needs attention')
     } finally {
@@ -261,7 +266,7 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
       setRenameCompleted(true)
       onStatusChange(`${items.length} files renamed · undo available`)
     } catch (error) {
-      onStatusChange(error instanceof Error ? error.message : 'Rename could not be completed')
+      onStatusChange(describeError(error, 'Rename could not be completed'))
     } finally {
       setRenameLoading(false)
     }
@@ -273,7 +278,7 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
       setRenameCompleted(false)
       onStatusChange('Rename undone')
     } catch (error) {
-      onStatusChange(error instanceof Error ? error.message : 'Undo could not be completed')
+      onStatusChange(describeError(error, 'Undo could not be completed'))
     }
   }
 

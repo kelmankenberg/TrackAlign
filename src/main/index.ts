@@ -16,7 +16,7 @@ type RenameManifest = { id: string; createdAt: string; items: Array<{ originalPa
 
 function spotifyClientId() {
   const clientId = process.env.SPOTIFY_CLIENT_ID
-  if (!clientId) throw new Error('Spotify is not configured. Set SPOTIFY_CLIENT_ID in local development configuration.')
+  if (!clientId) throw new Error('Spotify is not configured. Copy .env.example to .env, set SPOTIFY_CLIENT_ID to your Spotify app client ID, then restart TrackAlign.')
   return clientId
 }
 
