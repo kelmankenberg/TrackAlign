@@ -243,7 +243,7 @@ describe('App shell', () => {
     render(<App />)
 
     await user.click(screen.getByRole('heading', { name: /connect spotify/i }).closest('button')!)
-    await user.type(screen.getByRole('textbox', { name: /search spotify/i }), 'road trip')
+    await user.type(screen.getByRole('combobox', { name: /search spotify/i }), 'road trip')
     await user.click(screen.getByRole('button', { name: /^search$/i }))
 
     const result = await screen.findByRole('button', { name: /road trip mix/i })
@@ -251,6 +251,20 @@ describe('App shell', () => {
 
     expect(window.trackAlign.spotify.loadCollection).toHaveBeenCalledWith('https://open.spotify.com/playlist/p1')
     expect((await screen.findAllByRole('heading', { name: 'Road Trip Mix' })).length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('remembers the last 10 Spotify searches and offers them from the search input', async () => {
+    vi.mocked(window.trackAlign.spotify.search).mockResolvedValue([])
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('heading', { name: /connect spotify/i }).closest('button')!)
+    const searchInput = screen.getByRole('combobox', { name: /search spotify/i })
+    await user.type(searchInput, 'road trip')
+    await user.click(screen.getByRole('button', { name: /^search$/i }))
+
+    expect(JSON.parse(localStorage.getItem('trackalign-search-history') || '[]')).toEqual(['road trip'])
+    expect(document.getElementById('spotify-search-history')?.querySelector('option')?.getAttribute('value')).toBe('road trip')
   })
 
   it('lets Help sections collapse and expand independently, with only the first expanded by default', async () => {
