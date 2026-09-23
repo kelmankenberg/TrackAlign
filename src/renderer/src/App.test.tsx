@@ -231,4 +231,17 @@ describe('App shell', () => {
     expect(window.trackAlign.spotify.loadCollection).toHaveBeenCalledWith('https://open.spotify.com/playlist/p1')
     expect((await screen.findAllByRole('heading', { name: 'Road Trip Mix' })).length).toBeGreaterThanOrEqual(1)
   })
+
+  it('lets Help sections collapse and expand independently, with only the first expanded by default', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'Open contextual help' }))
+    expect(screen.getByText(/load a folder, choose the tracks/i)).toBeInTheDocument()
+    expect(screen.queryByText(/search box in the load a playlist or album dialog/i)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Finding a Spotify playlist or album' }))
+    expect(screen.getByText(/search box in the load a playlist or album dialog/i)).toBeInTheDocument()
+    expect(screen.queryByText(/load a folder, choose the tracks/i)).not.toBeInTheDocument()
+  })
 })

@@ -94,6 +94,39 @@ const changelog = [
   { version: 'Next', date: 'Planned', notes: ['Local audio folder inventory', 'Spotify OAuth with PKCE', 'Matching review workspace'] },
 ]
 
+const helpSections: Array<{ id: string; title: string; paragraphs: string[]; tip?: string }> = [
+  {
+    id: 'getting-started',
+    title: 'Getting started',
+    paragraphs: [
+      'Load a folder, choose the tracks you want to organize, then connect a Spotify playlist or album to review the proposed order.',
+      'Every match remains visible for inspection. You can adjust the plan before any files are renamed.',
+    ],
+  },
+  {
+    id: 'finding-a-collection',
+    title: 'Finding a Spotify playlist or album',
+    paragraphs: [
+      'Use the search box in the Load a playlist or album dialog to find a collection by name instead of pasting a URL. Filter results to All, Playlists, or Albums, then select a result to load it immediately.',
+      'Results show cover art, owner or artist, and track count when Spotify provides it. If you already have a Spotify share link, you can still paste it directly below the search results.',
+    ],
+  },
+  {
+    id: 'matching-and-templates',
+    title: 'Matching and rename templates',
+    paragraphs: [
+      'TrackAlign matches your selected local files to the loaded collection using metadata first, with filename matching as a fallback. Every proposed match, including its confidence, is shown for review before anything is renamed.',
+      'Customize the expected filename in Settings using tokens for track number, artist, album, title, and year.',
+    ],
+  },
+  {
+    id: 'troubleshooting',
+    title: 'Troubleshooting Spotify access',
+    paragraphs: [],
+    tip: 'Albums and playlists you create yourself always work best. Spotify blocks third-party apps from loading algorithmic playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You) and, without extended API access, playlists you don\u2019t own or follow can also fail with a \u201cForbidden\u201d error \u2014 this is a Spotify platform restriction, not a TrackAlign bug.',
+  },
+]
+
 const ZOOM_MIN = 0.5
 const ZOOM_MAX = 2
 const ZOOM_STEP = 0.1
@@ -107,6 +140,7 @@ function App() {
   const [panel, setPanel] = useState<SidePanel>(null)
   const [moreOpen, setMoreOpen] = useState(false)
   const [expandedChangelog, setExpandedChangelog] = useState('0.1.0')
+  const [expandedHelp, setExpandedHelp] = useState(helpSections[0].id)
   const [status, setStatus] = useState('Ready for a folder')
   const [zoomFactor, setZoomFactor] = useState(() => clampZoom(Number(localStorage.getItem('trackalign-zoom')) || 1))
 
@@ -228,7 +262,7 @@ function App() {
             <div><span className="eyebrow">{panel === 'help' ? 'Support' : panel === 'changelog' ? 'Release notes' : 'Feedback'}</span><h2>{panel === 'help' ? 'How TrackAlign works' : panel === 'changelog' ? 'Changelog' : 'Report an issue'}</h2></div>
             <button className="toolbar-icon" onClick={() => setPanel(null)} title="Close panel" aria-label="Close panel"><X size={18} /></button>
           </div>
-          {panel === 'help' ? <div className="panel-copy"><p>Load a folder, choose the tracks you want to organize, then connect a Spotify playlist or album to review the proposed order.</p><p>Every match remains visible for inspection. You can adjust the plan before any files are renamed.</p><div className="help-tip"><HelpCircle size={16} /><span>Contextual guidance will follow the page you are viewing.</span></div><div className="help-tip"><HelpCircle size={16} /><span>Albums and playlists you create yourself always work best. Spotify blocks third-party apps from loading algorithmic playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You) and, without extended API access, playlists you don&rsquo;t own or follow can also fail with a &ldquo;Forbidden&rdquo; error &mdash; this is a Spotify platform restriction, not a TrackAlign bug.</span></div></div> : panel === 'changelog' ? <div className="changelog-list">{changelog.map((entry) => <section className="changelog-entry" key={entry.version}><button className="changelog-toggle" onClick={() => setExpandedChangelog(expandedChangelog === entry.version ? '' : entry.version)}><span><strong>{entry.version}</strong><small>{entry.date}</small></span><ChevronDown className={expandedChangelog === entry.version ? 'rotated' : ''} size={17} /></button>{expandedChangelog === entry.version && <ul>{entry.notes.map((note) => <li key={note}>{note}</li>)}</ul>}</section>)}</div> : <ReportIssuePanel />}
+          {panel === 'help' ? <div className="help-sections">{helpSections.map((section) => <section className="help-section" key={section.id}><button className="help-section-toggle" onClick={() => setExpandedHelp(expandedHelp === section.id ? '' : section.id)} aria-expanded={expandedHelp === section.id}><strong>{section.title}</strong><ChevronDown className={expandedHelp === section.id ? 'rotated' : ''} size={17} /></button>{expandedHelp === section.id && <div className="panel-copy">{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}{section.tip && <div className="help-tip"><HelpCircle size={16} /><span>{section.tip}</span></div>}</div>}</section>)}</div> : panel === 'changelog' ? <div className="changelog-list">{changelog.map((entry) => <section className="changelog-entry" key={entry.version}><button className="changelog-toggle" onClick={() => setExpandedChangelog(expandedChangelog === entry.version ? '' : entry.version)}><span><strong>{entry.version}</strong><small>{entry.date}</small></span><ChevronDown className={expandedChangelog === entry.version ? 'rotated' : ''} size={17} /></button>{expandedChangelog === entry.version && <ul>{entry.notes.map((note) => <li key={note}>{note}</li>)}</ul>}</section>)}</div> : <ReportIssuePanel />}
         </aside>}
       </div>
       <footer className="statusbar"><span className="status-dot" />{status}<span className="statusbar-spacer" /><span className="zoom-indicator" title="Zoom level (Ctrl+0/-/=/mouse wheel)">{Math.round(zoomFactor * 100)}%</span></footer>
