@@ -122,7 +122,7 @@ function App() {
         </div>
         {navMode === 'toolbar' && <nav className="toolbar-nav" aria-label="Primary navigation">{renderNavItems(false)}</nav>}
         <div className="toolbar-spacer" />
-        <div className="toolbar-controls" onPointerDown={(event) => event.stopPropagation()}>
+        <div className="toolbar-controls" onPointerDown={(event) => event.stopPropagation()} onMouseDown={(event) => event.stopPropagation()}>
           <button className="toolbar-action" onClick={() => setPanel('help')} title="Open contextual help" aria-label="Open contextual help"><CircleHelp size={18} /></button>
           <button className="toolbar-action" onClick={() => setMoreOpen((open) => !open)} title="More options" aria-label="More options"><MoreHorizontal size={19} /></button>
           <div className="window-controls" aria-label="Window controls">
