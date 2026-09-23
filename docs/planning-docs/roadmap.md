@@ -12,7 +12,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Add Linux and Windows packaging configuration.
   - [x] electron-builder config for Linux (AppImage, deb) and Windows (nsis, portable); `npm run package:linux` / `npm run package:win`.
   - [x] Verified `electron-builder --linux --dir` produces a valid unpacked build.
-  - [ ] Custom packaged app icon assets (PNG/ICO) beyond the placeholder SVG.
+  - [x] Custom packaged app icon assets (PNG/ICO) beyond the placeholder SVG. Generated from the app's Lucide `list-ordered` mark on a moss-green rounded square (`build/icon.png`, `build/icon.ico`, source `build/icon-master.svg`); also used as the runtime `BrowserWindow` icon (`resources/icon.png`).
   - [!] Unpacked Linux debug builds segfault under the default sandbox in this environment (missing root-owned setuid `chrome-sandbox`); this is a known Linux/Electron limitation for `--dir` builds, not expected to affect real AppImage/deb artifacts.
 
 ## App Shell
