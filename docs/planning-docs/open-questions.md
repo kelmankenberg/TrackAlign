@@ -27,4 +27,9 @@ This document contains active decisions that still need confirmation. Resolved d
 
 ## Remaining Decisions
 
-There are currently no unresolved planning questions.
+- Spotify Discovery (browse/search) proposal — see [spotify-discovery.md](spotify-discovery.md) for full detail. Open items:
+  - Should the native "browse your library" view cover playlists only, or also saved albums (requires adding the `user-library-read` scope)?
+  - Should search cover playlists, albums, or both by default?
+  - Should search results be a short fixed list, or support pagination?
+  - Is the embedded-Spotify-web-UI browsing approach (vs. a native API-driven library list) still wanted, given its extra complexity and the need for a second, separate Spotify sign-in?
+  - Build order: search first as a standalone improvement, or search and native library browse together as one slideout?
