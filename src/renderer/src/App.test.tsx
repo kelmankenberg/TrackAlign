@@ -265,4 +265,40 @@ describe('App shell', () => {
     expect(screen.getByText(/search box in the load a playlist or album dialog/i)).toBeInTheDocument()
     expect(screen.queryByText(/load a folder, choose the tracks/i)).not.toBeInTheDocument()
   })
+
+  it('shows collection tracks with no local file as a highlighted missing row, resolvable via reverse match', async () => {
+    vi.mocked(window.trackAlign.inspectFolder).mockResolvedValueOnce({
+      cancelled: false,
+      folderPath: '/music/Album',
+      ignoredSymlinkCount: 0,
+      files: [
+        { name: 'One.mp3', path: '/music/Album/One.mp3', extension: '.mp3', hidden: false, readOnly: false, metadata: { title: 'Song One', artist: 'Artist A' } },
+        { name: 'Extra.mp3', path: '/music/Album/Extra.mp3', extension: '.mp3', hidden: false, readOnly: false, metadata: { title: 'Totally Unrelated', artist: 'Nobody' } },
+      ],
+    })
+    vi.mocked(window.trackAlign.spotify.loadCollection).mockResolvedValueOnce({
+      type: 'playlist',
+      name: 'Two Tracks',
+      url: 'https://open.spotify.com/playlist/two',
+      tracks: [
+        { position: 1, artist: 'Artist A', title: 'Song One', album: 'Album', year: 2020, duration: '3:00', durationMs: 180000 },
+        { position: 2, artist: 'Artist B', title: 'Song Two', album: 'Album', year: 2020, duration: '3:00', durationMs: 180000 },
+      ],
+    })
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('heading', { name: /choose a folder/i }).closest('button')!)
+    await screen.findAllByText('One.mp3')
+
+    await user.click(screen.getByRole('heading', { name: /connect spotify/i }).closest('button')!)
+    await user.click(screen.getByRole('button', { name: /^load collection$/i }))
+
+    expect(await screen.findByRole('combobox', { name: /assign a local file to song two/i })).toBeInTheDocument()
+    expect(screen.getByText('missing')).toBeInTheDocument()
+
+    await user.selectOptions(screen.getByRole('combobox', { name: /assign a local file to song two/i }), '/music/Album/Extra.mp3')
+
+    expect(screen.queryByText('missing')).not.toBeInTheDocument()
+  })
 })
