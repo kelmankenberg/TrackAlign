@@ -7,13 +7,14 @@ body { margin: 0; min-width: 980px; min-height: 100vh; background: radial-gradie
 button { border: 0; font: inherit; color: inherit; cursor: pointer; }
 .app-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 .topbar { height: 68px; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--line); background: rgba(251,252,249,.86); backdrop-filter: blur(14px); position: relative; z-index: 3; -webkit-app-region: no-drag; }
-.toolbar-icon, .toolbar-action, .window-control, .topbar .brand-lockup, .topbar .toolbar-nav, .topbar .nav-item, .topbar .more-menu { -webkit-app-region: no-drag; }
+.toolbar-controls, .toolbar-icon, .toolbar-action, .window-control, .topbar .brand-lockup, .topbar .toolbar-nav, .topbar .nav-item, .topbar .more-menu { -webkit-app-region: no-drag; }
 .toolbar-icon, .toolbar-action, .window-control { width: 34px; height: 34px; display: inline-grid; place-items: center; border-radius: 8px; background: transparent; color: #718078; transition: background .18s, color .18s; }
 .toolbar-icon:hover, .toolbar-action:hover { background: #eaf0e8; color: var(--ink); }
 .brand-lockup { display: flex; align-items: center; gap: 10px; padding-left: 3px; -webkit-app-region: drag; }
 .brand-mark { width: 28px; height: 28px; display: grid; place-items: center; background: var(--ink); color: var(--titlebar-background); border-radius: 8px; }
 .brand-name { font: 700 18px 'Space Grotesk', sans-serif; letter-spacing: 0; }
 .toolbar-spacer { flex: 1; -webkit-app-region: drag; }
+.toolbar-controls { display: flex; align-items: center; gap: 12px; }
 .window-controls { display: flex; align-items: center; gap: 2px; margin-left: 6px; -webkit-app-region: no-drag; }
 .window-control { width: 34px; height: 30px; border-radius: 5px; }
 .window-control:hover { background: #eaf0e8; color: var(--ink); }

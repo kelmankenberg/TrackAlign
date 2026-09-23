@@ -122,12 +122,14 @@ function App() {
         </div>
         {navMode === 'toolbar' && <nav className="toolbar-nav" aria-label="Primary navigation">{renderNavItems(false)}</nav>}
         <div className="toolbar-spacer" />
-        <button className="toolbar-action" onClick={() => setPanel('help')} title="Open contextual help" aria-label="Open contextual help"><CircleHelp size={18} /></button>
-        <button className="toolbar-action" onClick={() => setMoreOpen((open) => !open)} title="More options" aria-label="More options"><MoreHorizontal size={19} /></button>
-        <div className="window-controls" aria-label="Window controls">
-          <button className="window-control" onClick={() => window.trackAlign.window.minimize()} title="Minimize" aria-label="Minimize"><Minus size={15} /></button>
-          <button className="window-control" onClick={() => window.trackAlign.window.toggleMaximize()} title="Maximize or restore" aria-label="Maximize or restore"><Square size={13} /></button>
-          <button className="window-control close-control" onClick={() => window.trackAlign.window.close()} title="Close" aria-label="Close"><X size={15} /></button>
+        <div className="toolbar-controls" onPointerDown={(event) => event.stopPropagation()}>
+          <button className="toolbar-action" onClick={() => setPanel('help')} title="Open contextual help" aria-label="Open contextual help"><CircleHelp size={18} /></button>
+          <button className="toolbar-action" onClick={() => setMoreOpen((open) => !open)} title="More options" aria-label="More options"><MoreHorizontal size={19} /></button>
+          <div className="window-controls" aria-label="Window controls">
+            <button className="window-control" onClick={() => window.trackAlign.window.minimize()} title="Minimize" aria-label="Minimize"><Minus size={15} /></button>
+            <button className="window-control" onClick={() => window.trackAlign.window.toggleMaximize()} title="Maximize or restore" aria-label="Maximize or restore"><Square size={13} /></button>
+            <button className="window-control close-control" onClick={() => window.trackAlign.window.close()} title="Close" aria-label="Close"><X size={15} /></button>
+          </div>
         </div>
         {moreOpen && <div className="more-menu">
           <button onClick={() => window.location.reload()}><RotateCcw size={16} />Restart TrackAlign</button>
