@@ -2,6 +2,8 @@
 
 Use this checklist for every TrackAlign release. Replace `0.1.1` and `v0.1.1` with the version being published.
 
+The More-menu version comes from Electron's `app.getVersion()`, which uses the version in `package.json`. The Changelog panel is generated from the root `CHANGELOG.md` file at build time, so both files must be correct before packaging.
+
 ## 1. Choose and prepare the version
 
 - [ ] Choose the semantic version and decide whether it is a pre-release or full release.
@@ -9,6 +11,7 @@ Use this checklist for every TrackAlign release. Replace `0.1.1` and `v0.1.1` wi
 
   ```bash
   git tag --list v0.1.1
+  git ls-remote --tags origin refs/tags/v0.1.1
   gh release view v0.1.1
   ```
 
@@ -18,11 +21,31 @@ Use this checklist for every TrackAlign release. Replace `0.1.1` and `v0.1.1` wi
   npm version 0.1.1 --no-git-tag-version
   ```
 
-- [ ] Update the in-app version display, Changelog, roadmap, and release documentation as needed.
-- [ ] Search for stale version strings:
+- [ ] Add the release to the top of `CHANGELOG.md` using the format consumed by the in-app panel:
+
+  ```markdown
+  ## 0.1.1
+
+  ### Features
+
+  - Added a user-visible feature.
+
+  ### Enhancements
+
+  - Improved an existing workflow.
+
+  ### Fixes
+
+  - Fixed a reported problem.
+  ```
+
+- [ ] Keep release sections in newest-first order. The first `##` release is expanded by default in the app.
+- [ ] Update the roadmap and other release documentation as needed.
+- [ ] Verify the package-derived version and ensure no runtime version is hard-coded in `src/`:
 
   ```bash
-  rg '0\.1\.0|v0\.1\.0' --glob '!release/**' --glob '!node_modules/**'
+  node -p "require('./package.json').version"
+  rg 'TrackAlign [0-9]+\.[0-9]+\.[0-9]+' src/ || true
   ```
 
 ## 2. Validate the source tree
@@ -54,7 +77,7 @@ Use this checklist for every TrackAlign release. Replace `0.1.1` and `v0.1.1` wi
 - [ ] Commit the version and release-preparation changes, then push `main`:
 
   ```bash
-  git add package.json package-lock.json README.md docs/
+  git add package.json package-lock.json CHANGELOG.md README.md docs/
   git commit -m "Prepare TrackAlign v0.1.1 release"
   git push origin main
   ```
@@ -86,7 +109,8 @@ Use this checklist for every TrackAlign release. Replace `0.1.1` and `v0.1.1` wi
 - [ ] Inspect packaging output for warnings about default icons, missing resources, signing, or desktop identity.
 - [ ] Smoke-test the AppImage and `.deb` on Linux.
 - [ ] Smoke-test the installer and portable executable on Windows when a Windows machine is available.
-- [ ] Verify OAuth, filesystem access, window controls, and app icons in an installed build.
+- [ ] Verify OAuth, filesystem access, window controls, app icons, the More-menu version, and Changelog content in an installed build.
+- [ ] Confirm the packaged runtime reports the same version as `package.json`; the More menu should not require a separate version edit.
 - [ ] Optionally generate checksums and upload them with the release:
 
   ```bash
@@ -100,7 +124,8 @@ Use this checklist for every TrackAlign release. Replace `0.1.1` and `v0.1.1` wi
 
 ## 4. Write and review release notes
 
-- [ ] Create a temporary release-notes file outside the repository or in an intentionally tracked changelog.
+- [ ] Use the matching `CHANGELOG.md` release section as the source for the GitHub release notes.
+- [ ] Create a temporary release-notes file outside the repository, adapting the changelog bullets into a short release summary when needed.
 - [ ] Include:
   - A short release summary.
   - Major features and user-visible changes.
@@ -198,5 +223,6 @@ Do not start another terminal command while a large foreground upload is still r
 
 - [ ] Announce the release or link it from Discussions as appropriate.
 - [ ] Record smoke-test results and newly discovered issues.
-- [ ] Move the Changelog/roadmap to the next development version.
+- [ ] Add the next version section to `CHANGELOG.md` when user-visible changes begin accumulating; do not add a separate hard-coded changelog in application code.
+- [ ] Move the roadmap to the next development version or milestone.
 - [ ] Keep `release/` untracked; release binaries belong in GitHub Releases, not Git history.
