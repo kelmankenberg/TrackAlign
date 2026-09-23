@@ -162,17 +162,25 @@ describe('App shell', () => {
     expect(await screen.findByRole('button', { name: /connect github/i })).toBeInTheDocument()
   })
 
-  it('opens the Help panel with a Discussions section from the Discussions page', async () => {
+  it('shows page-specific Help content that switches with the current page', async () => {
     const user = userEvent.setup()
     render(<App />)
 
     await user.click(screen.getByRole('button', { name: 'Discussions' }))
     await user.click(screen.getByRole('button', { name: 'Help' }))
     const helpPanel = screen.getByRole('complementary', { name: 'Contextual help' })
-    expect(within(helpPanel).getByRole('heading', { name: /how trackalign works/i })).toBeInTheDocument()
+    expect(within(helpPanel).getByRole('heading', { name: 'Discussions help' })).toBeInTheDocument()
+    expect(within(helpPanel).getByText(/connect your github account once to browse, start, and reply/i)).toBeInTheDocument()
+    expect(within(helpPanel).queryByText(/build the expected filename from tokens/i)).not.toBeInTheDocument()
 
-    await user.click(within(helpPanel).getByRole('button', { name: 'Discussions' }))
-    expect(within(helpPanel).getByText(/browse, start, and reply to trackalign discussions/i)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
+    expect(within(helpPanel).getByRole('heading', { name: 'Settings help' })).toBeInTheDocument()
+    expect(within(helpPanel).getByText(/build the expected filename from tokens/i)).toBeInTheDocument()
+    expect(within(helpPanel).queryByText(/connect your github account once to browse, start, and reply/i)).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Workspace' }))
+    expect(within(helpPanel).getByRole('heading', { name: 'Workspace help' })).toBeInTheDocument()
+    expect(within(helpPanel).getByText(/load a folder, choose the tracks/i)).toBeInTheDocument()
   })
 
   it('opens the Report an issue slideout from the More menu with a GitHub connect prompt', async () => {
