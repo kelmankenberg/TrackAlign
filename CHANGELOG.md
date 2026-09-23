@@ -1,19 +1,32 @@
-# TrackAlign Changelog
+# Changelog
 
-Add new releases as `##` sections. Keep the date/status on the next line and changes as bullet points; the app displays sections in this file's order.
+## 0.2.0
+
+### Features
+
+- Added Spotify playlist and album search with a history of the last ten searches.
+- Added highlighted missing-track rows that can be resolved by assigning unmatched local files.
+- Added in-app GitHub issue reporting and Discussions.
+
+### Enhancements
+
+- Added page-specific, collapsible Help content for Workspace, Settings, and Discussions.
+- Added persisted window placement, last-used folder, Spotify authentication, navigation layout, theme, rename template, and zoom settings.
+- Added a custom application icon with Linux desktop and taskbar integration.
+- Sourced the More-menu version from the root package version.
+- Sourced the in-app Changelog panel directly from this Markdown file.
+
+### Fixes
+
+- Fixed Linux packages installing only a single oversized icon instead of standard desktop icon sizes.
+- Fixed loaded Workspace state being discarded when navigating to another page.
 
 ## 0.1.0
-**Date:** September 2026
 
-- Initial TrackAlign desktop shell and three-state navigation layout.
-- Local audio folder inventory for MP3, FLAC, OGG, and M4A files.
-- Spotify OAuth with PKCE, playlist/album loading, and collection search.
-- Metadata and filename-based matching with a review workspace.
-- Collision-safe renaming and undo history.
-- Settings, page-specific Help, Changelog, issue reporting, and Discussions.
+### Features
 
-## Next
-**Date:** Planned
-
-- Native Spotify library browsing for playlists and saved albums.
-- Additional packaged-app testing and release hardening.
+- Added the TrackAlign desktop shell with three navigation layouts and eight appearance presets.
+- Added local audio folder inventory for MP3, FLAC, OGG, and M4A files.
+- Added Spotify OAuth with PKCE, playlist and album loading, and ordered collection previews.
+- Added metadata and filename-based matching with confidence and evidence in a review workspace.
+- Added customizable rename templates, collision-safe renaming, and multi-operation undo history.

@@ -212,11 +212,12 @@ describe('App shell', () => {
     await user.click(screen.getByRole('button', { name: 'Changelog' }))
 
     const panel = screen.getByRole('complementary', { name: 'Changelog' })
-    expect(within(panel).getByText(/initial trackalign desktop shell/i)).toBeInTheDocument()
+    expect(within(panel).getByRole('heading', { name: 'Features' })).toBeInTheDocument()
+    expect(within(panel).getByText(/spotify playlist and album search/i)).toBeInTheDocument()
 
-    await user.click(within(panel).getByRole('button', { name: /next.*planned/i }))
-    expect(within(panel).getByText(/native spotify library browsing/i)).toBeInTheDocument()
-    expect(within(panel).queryByText(/initial trackalign desktop shell/i)).not.toBeInTheDocument()
+    await user.click(within(panel).getByRole('button', { name: /0\.1\.0.*5 changes/i }))
+    expect(within(panel).getByText(/local audio folder inventory/i)).toBeInTheDocument()
+    expect(within(panel).queryByText(/spotify playlist and album search/i)).not.toBeInTheDocument()
   })
 
   it('keeps the loaded folder in Workspace after navigating to Settings and back', async () => {

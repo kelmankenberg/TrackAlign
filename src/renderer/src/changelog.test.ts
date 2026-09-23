@@ -2,28 +2,35 @@ import { describe, expect, it } from 'vitest'
 import { parseChangelog } from './changelog'
 
 describe('parseChangelog', () => {
-  it('extracts ordered release sections, dates, and bullet notes', () => {
+  it('extracts ordered releases with categorized Markdown sections', () => {
     const markdown = `# Changelog
 
 ## 1.0.0
-**Date:** January 2030
+
+### Features
 
 - First change
 - Second change
 
-## Next
-**Status:** Planned
+### Fixes
 
 * Future change
 `
 
     expect(parseChangelog(markdown)).toEqual([
-      { version: '1.0.0', date: 'January 2030', notes: ['First change', 'Second change'] },
-      { version: 'Next', date: 'Planned', notes: ['Future change'] },
+      {
+        version: '1.0.0',
+        sections: [
+          { title: 'Features', notes: ['First change', 'Second change'] },
+          { title: 'Fixes', notes: ['Future change'] },
+        ],
+      },
     ])
   })
 
-  it('ignores introductory copy and empty release sections', () => {
-    expect(parseChangelog('# Changelog\nIntro\n\n## Empty\n**Date:** Soon')).toEqual([])
+  it('supports uncategorized bullets and ignores empty release sections', () => {
+    expect(parseChangelog('# Changelog\n\n## 1.0.0\n- Change\n\n## Empty')).toEqual([
+      { version: '1.0.0', sections: [{ title: 'Changes', notes: ['Change'] }] },
+    ])
   })
 })
