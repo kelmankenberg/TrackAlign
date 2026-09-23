@@ -29,6 +29,7 @@ interface Window {
 	trackAlign: {
 		appName: string
 		inspectFolder: () => Promise<FolderInventory>
+		refreshFolder: (folderPath: string) => Promise<FolderInventory>
 		rename: {
 			apply: (items: Array<{ sourcePath: string; targetName: string }>) => Promise<{ id: string }>
 			undoLatest: () => Promise<{ undone: true; id: string }>

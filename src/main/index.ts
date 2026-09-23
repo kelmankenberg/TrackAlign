@@ -182,11 +182,7 @@ async function loadSpotifyCollection(sourceUrl: string) {
   return { type: source.type, name: source.type === 'playlist' ? 'Spotify playlist' : 'Spotify album', url: sourceUrl, tracks }
 }
 
-async function inspectFolder() {
-  const selection = await dialog.showOpenDialog({ properties: ['openDirectory'] })
-  if (selection.canceled || selection.filePaths.length === 0) return { cancelled: true as const }
-
-  const folderPath = selection.filePaths[0]
+async function scanFolder(folderPath: string) {
   const entries = await readdir(folderPath, { withFileTypes: true })
   let ignoredSymlinkCount = 0
   const files = []
@@ -235,6 +231,12 @@ async function inspectFolder() {
   }
 
   return { cancelled: false as const, folderPath, ignoredSymlinkCount, files }
+}
+
+async function inspectFolder() {
+  const selection = await dialog.showOpenDialog({ properties: ['openDirectory'] })
+  if (selection.canceled || selection.filePaths.length === 0) return { cancelled: true as const }
+  return scanFolder(selection.filePaths[0])
 }
 
 function historyPath() {
@@ -351,6 +353,7 @@ function createWindow() {
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null)
   ipcMain.handle('folder:inspect', inspectFolder)
+  ipcMain.handle('folder:refresh', (_event, folderPath: string) => scanFolder(folderPath))
   ipcMain.handle('rename:apply', (_event, items: RenameItem[]) => applyRenames(items))
   ipcMain.handle('rename:undo-latest', undoLatestRename)
   ipcMain.handle('spotify:authenticate', startSpotifyAuth)

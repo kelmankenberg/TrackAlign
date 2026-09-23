@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 contextBridge.exposeInMainWorld('trackAlign', {
   appName: 'TrackAlign',
   inspectFolder: () => ipcRenderer.invoke('folder:inspect'),
+  refreshFolder: (folderPath: string) => ipcRenderer.invoke('folder:refresh', folderPath),
   rename: {
     apply: (items: Array<{ sourcePath: string; targetName: string }>) => ipcRenderer.invoke('rename:apply', items),
     undoLatest: () => ipcRenderer.invoke('rename:undo-latest'),

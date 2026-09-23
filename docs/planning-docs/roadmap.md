@@ -36,6 +36,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Detect and visibly flag read-only or otherwise unrenameable files.
 - [x] Add Select All and Select None controls.
 - [x] Extract basic audio metadata.
+- [x] Add a refresh action to rescan the current folder for newly added files without reopening the picker.
 
 ## Spotify Integration
 
