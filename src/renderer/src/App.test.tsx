@@ -172,4 +172,25 @@ describe('App shell', () => {
     expect(screen.getByRole('heading', { name: /report an issue/i })).toBeInTheDocument()
     expect(await screen.findByRole('button', { name: /connect github/i })).toBeInTheDocument()
   })
+
+  it('keeps the loaded folder in Workspace after navigating to Settings and back', async () => {
+    vi.mocked(window.trackAlign.inspectFolder).mockResolvedValueOnce({
+      cancelled: false,
+      folderPath: '/music/Album',
+      ignoredSymlinkCount: 0,
+      files: [{ name: 'One.mp3', path: '/music/Album/One.mp3', extension: '.mp3', hidden: false, readOnly: false, metadata: {} }],
+    })
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('heading', { name: /choose a folder/i }).closest('button')!)
+    await screen.findAllByText('One.mp3')
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
+    expect(screen.getByRole('heading', { name: /^settings$/i })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Workspace' }))
+    expect(await screen.findAllByText('One.mp3')).toHaveLength(2)
+    expect(window.trackAlign.inspectFolder).toHaveBeenCalledTimes(1)
+  })
 })

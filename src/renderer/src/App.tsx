@@ -217,9 +217,9 @@ function App() {
       <div className="app-body">
         {navMode !== 'toolbar' && <aside className={`nav-rail ${navMode === 'iconOnly' ? 'icon-only' : ''}`} aria-label="Primary navigation">{renderNavItems(navMode === 'expanded')}</aside>}
         <main className="page-content">
-          {page === 'workspace' ? <Workspace onHelp={() => setPanel('help')} onStatusChange={setStatus} renameTemplate={renameTemplate} />
-            : page === 'discussions' ? <DiscussionsPage onStatusChange={setStatus} />
-            : <SettingsPage onHelp={() => setPanel('help')} theme={theme} onThemeChange={setAppTheme} renameTemplate={renameTemplate} onRenameTemplateChange={setAppRenameTemplate} navMode={navMode} onNavModeChange={setAppNavMode} />}
+          <div style={page === 'workspace' ? undefined : { display: 'none' }}><Workspace onHelp={() => setPanel('help')} onStatusChange={setStatus} renameTemplate={renameTemplate} /></div>
+          <div style={page === 'discussions' ? undefined : { display: 'none' }}><DiscussionsPage onStatusChange={setStatus} /></div>
+          <div style={page === 'settings' ? undefined : { display: 'none' }}><SettingsPage onHelp={() => setPanel('help')} theme={theme} onThemeChange={setAppTheme} renameTemplate={renameTemplate} onRenameTemplateChange={setAppRenameTemplate} navMode={navMode} onNavModeChange={setAppNavMode} /></div>
         </main>
         {panel && <aside className="side-panel" aria-label={panel === 'help' ? 'Contextual help' : panel === 'changelog' ? 'Changelog' : 'Report an issue'}>
           <div className="panel-header">
