@@ -10,4 +10,8 @@ describe('filename rendering', () => {
     expect(renderFilename('{trackNumber} - {artist} - {album} - {title}', { trackNumber: 1, artist: 'A/B', title: 'Song?' }, '.flac')).toBe('01 - AB - Song.flac')
     expect(sanitizeFilename(' name:with*invalid? ')).toBe('namewithinvalid')
   })
+
+  it('renders album and year fields when available', () => {
+    expect(renderFilename('{artist} - {album} - {title} ({year})', { artist: 'Artist', album: 'Record', title: 'Title', year: 2026 }, '.m4a')).toBe('Artist - Record - Title (2026).m4a')
+  })
 })

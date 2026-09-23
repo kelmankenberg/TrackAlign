@@ -20,4 +20,16 @@ describe('matching', () => {
     expect(proposal.status).toBe('unmatched')
     expect(proposal.trackPosition).toBeNull()
   })
+
+  it('keeps duplicate Spotify track occurrences distinct by position', () => {
+    const proposals = matchFiles([
+      { path: '/music/01.mp3', name: 'First.mp3', metadata: { title: 'First', artist: 'Artist' } },
+      { path: '/music/02.mp3', name: 'First again.mp3', metadata: { title: 'First', artist: 'Artist' } },
+    ], [
+      { position: 1, artist: 'Artist', title: 'First', duration: '3:00' },
+      { position: 2, artist: 'Artist', title: 'First', duration: '3:00' },
+    ])
+
+    expect(proposals.map((proposal) => proposal.trackPosition)).toEqual([1, 2])
+  })
 })
