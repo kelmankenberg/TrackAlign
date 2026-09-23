@@ -85,7 +85,9 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
   - [x] Folder inventory tests against real temp directories (extension filtering, hidden files, symlinks, read-only flags, graceful metadata fallback).
   - [x] Spotify collection tests with a mocked fetch (URL parsing, pagination, duplicate/position preservation, album metadata, 403/429 error detail).
   - [ ] IPC boundary tests (renderer ↔ main) and packaged OAuth callback tests.
-- [ ] Add UI and accessibility tests for the shell and primary workflow.
+- [x] Add UI and accessibility tests for the shell and primary workflow.
+  - [x] Navigation, page switching, appearance presets, and rename template controls (`src/renderer/src/App.test.tsx`, Vitest + jsdom + Testing Library).
+  - [x] Accessible-name coverage for icon-only toolbar controls.
 - [ ] Run packaged smoke tests on Linux and Windows.
 - [x] Prepare user setup, OAuth, troubleshooting, and release documentation (see project [README.md](../../README.md)).
 
