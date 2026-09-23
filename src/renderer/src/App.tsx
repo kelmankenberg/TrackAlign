@@ -12,6 +12,7 @@ import {
   CircleAlert,
   CircleCheck,
   CircleHelp,
+  Eraser,
   ExternalLink,
   FileMusic,
   FolderOpen,
@@ -365,8 +366,20 @@ function Workspace({ onHelp, onStatusChange, renameTemplate }: { onHelp: () => v
     }
   }
 
+  const clearWorkspace = () => {
+    setInventory(null)
+    setSelectedPaths(new Set())
+    setCollection(null)
+    setSourceUrl('https://open.spotify.com/playlist/example')
+    setSourceError('')
+    setSourceOpen(false)
+    setManualMatches({})
+    setRenameCompleted(false)
+    onStatusChange('Workspace cleared')
+  }
+
   return <section className="workspace-page">
-    <div className="page-heading"><div><span className="eyebrow">Workspace</span><h1>Align your collection.</h1><p>Match local audio to Spotify order, review the plan, and rename with confidence.</p></div><button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button></div>
+    <div className="page-heading"><div><span className="eyebrow">Workspace</span><h1>Align your collection.</h1><p>Match local audio to Spotify order, review the plan, and rename with confidence.</p></div><div className="page-heading-actions">{(inventory || collection) && <button className="secondary-button" onClick={clearWorkspace}><Eraser size={16} />Start over</button>}<button className="secondary-button" onClick={onHelp}><CircleHelp size={16} />Help</button></div></div>
     <div className="hero-grid">
       <button className="action-card primary-card" onClick={chooseFolder} disabled={loading}><div className="card-icon"><FolderOpen size={22} /></div><div><span className="card-kicker">Step 01</span><h2>{loading ? 'Inspecting folder...' : 'Choose a folder'}</h2><p>Open a local folder to inspect its audio files.</p></div><span className="card-arrow">→</span></button>
       <button className="action-card" onClick={() => setSourceOpen(true)}><div className="card-icon"><ListMusic size={22} /></div><div><span className="card-kicker">Step 02</span><h2>{collection ? collection.name : 'Connect Spotify'}</h2><p>{collection ? `${collection.tracks.length} tracks loaded in ${collection.type} order.` : 'Load a playlist or album and its original order.'}</p></div><span className="card-arrow">→</span></button>

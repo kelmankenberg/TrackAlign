@@ -193,4 +193,23 @@ describe('App shell', () => {
     expect(await screen.findAllByText('One.mp3')).toHaveLength(2)
     expect(window.trackAlign.inspectFolder).toHaveBeenCalledTimes(1)
   })
+
+  it('clears the loaded folder from Workspace via Start over', async () => {
+    vi.mocked(window.trackAlign.inspectFolder).mockResolvedValueOnce({
+      cancelled: false,
+      folderPath: '/music/Album',
+      ignoredSymlinkCount: 0,
+      files: [{ name: 'One.mp3', path: '/music/Album/One.mp3', extension: '.mp3', hidden: false, readOnly: false, metadata: {} }],
+    })
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('heading', { name: /choose a folder/i }).closest('button')!)
+    await screen.findAllByText('One.mp3')
+
+    await user.click(screen.getByRole('button', { name: 'Start over' }))
+    expect(screen.queryByText('One.mp3')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /choose a folder/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Start over' })).not.toBeInTheDocument()
+  })
 })
