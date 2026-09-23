@@ -39,6 +39,7 @@ button { border: 0; font: inherit; color: inherit; cursor: pointer; }
 h1, h2, p { margin: 0; }
 h1 { font: 700 42px/1.02 'Space Grotesk', sans-serif; letter-spacing: 0; max-width: 600px; }
 .page-heading p { color: var(--muted); margin-top: 13px; font-size: 15px; }
+.page-heading-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .secondary-button, .ghost-button { display: inline-flex; align-items: center; gap: 8px; padding: 10px 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); font-size: 12px; font-weight: 700; }
 .secondary-button:hover, .ghost-button:hover { border-color: #a9b9aa; background: #f4f8f1; }
 .hero-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }

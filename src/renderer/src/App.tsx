@@ -567,6 +567,15 @@ function DiscussionsPage({ onStatusChange }: { onStatusChange: (status: string) 
     loadDiscussions(nextCategoryId)
   }
 
+  const refreshDiscussions = () => {
+    if (view === 'thread' && detail) {
+      openDiscussion(detail.number)
+      return
+    }
+    window.trackAlign.github.listDiscussionCategories().then(setCategories).catch(() => setCategories([]))
+    loadDiscussions(categoryId)
+  }
+
   const openDiscussion = async (number: number) => {
     setView('thread')
     setLoading(true)
@@ -626,7 +635,7 @@ function DiscussionsPage({ onStatusChange }: { onStatusChange: (status: string) 
   }
 
   return <section className="workspace-page">
-    <div className="page-heading"><div><span className="eyebrow">Discussions</span><h1>Join the conversation.</h1><p>Browse ideas and questions from the TrackAlign community.</p></div>{view === 'list' && <button className="secondary-button" onClick={() => setView('new')}><Plus size={16} />New discussion</button>}{view !== 'list' && <button className="secondary-button" onClick={() => setView('list')}><ArrowLeft size={16} />Back to discussions</button>}</div>
+    <div className="page-heading"><div><span className="eyebrow">Discussions</span><h1>Join the conversation.</h1><p>Browse ideas and questions from the TrackAlign community.</p></div><div className="page-heading-actions">{view !== 'new' && <button className="toolbar-icon" onClick={refreshDiscussions} disabled={loading} title="Refresh" aria-label="Refresh"><RefreshCw size={16} className={loading ? 'spinning' : ''} /></button>}{view === 'list' && <button className="secondary-button" onClick={() => setView('new')}><Plus size={16} />New discussion</button>}{view !== 'list' && <button className="secondary-button" onClick={() => setView('list')}><ArrowLeft size={16} />Back to discussions</button>}</div></div>
     {error && <p className="source-error" role="alert">{error}</p>}
     {view === 'list' && <>
       <div className="category-filters">
