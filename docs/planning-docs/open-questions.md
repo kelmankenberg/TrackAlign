@@ -18,7 +18,7 @@ This document contains active decisions that still need confirmation. Resolved d
 - Navigation layout state persists between launches.
 - The More menu contains Restart TrackAlign, Changelog, and version information.
 - Changelog is a structured, collapsible panel with only the latest version expanded by default; its expansion state does not persist.
-- Contextual Help is static in the initial release; dynamic actions are a later consideration.
+- Contextual Help content is static text per page (Workspace, Settings, Discussions each show only their own sections); dynamic actions are a later consideration.
 - The status bar may persistently show the selected folder path and Spotify collection name.
 - The left rail is not resizable. Help and Changelog panels may be resized up to 40% of the app window width.
 - Symbolic links are ignored by default and reported in the folder inventory summary.

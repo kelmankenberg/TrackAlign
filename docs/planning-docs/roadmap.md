@@ -26,6 +26,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
   - [x] Lucide icon buttons with accessible names and tooltips.
   - [x] Workspace and Settings pages.
   - [x] Static right-side Help panel.
+  - [x] Made Help content collapsible per-section and page-specific (Workspace, Settings, Discussions each show only their own relevant sections, defaulting to the first expanded).
   - [x] Changelog panel with collapsible versions, latest expanded by default.
   - [x] Persistent status bar.
   - [x] Ctrl+0/-/=/mouse-wheel zoom control with the current level shown at the right of the status bar.
