@@ -6,14 +6,14 @@ html, body { min-height: 100%; overflow: hidden; }
 body { margin: 0; min-width: 980px; min-height: 100vh; background: radial-gradient(circle at 85% -10%, #e6f0d5 0, transparent 34%), #f3f5f1; }
 button { border: 0; font: inherit; color: inherit; cursor: pointer; }
 .app-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-.topbar { height: 68px; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--line); background: rgba(251,252,249,.86); backdrop-filter: blur(14px); position: relative; z-index: 3; -webkit-app-region: no-drag; }
-.toolbar-controls, .toolbar-icon, .toolbar-action, .window-control, .topbar .brand-lockup, .topbar .toolbar-nav, .topbar .nav-item, .topbar .more-menu { -webkit-app-region: no-drag; }
+.topbar { height: 68px; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--line); background: rgba(251,252,249,.86); backdrop-filter: blur(14px); position: relative; z-index: 3; -webkit-app-region: no-drag !important; }
+.toolbar-controls, .toolbar-icon, .toolbar-action, .window-control, .topbar .brand-lockup, .topbar .toolbar-nav, .topbar .nav-item, .topbar .more-menu { -webkit-app-region: no-drag !important; pointer-events: auto !important; }
 .toolbar-icon, .toolbar-action, .window-control { width: 34px; height: 34px; display: inline-grid; place-items: center; border-radius: 8px; background: transparent; color: #718078; transition: background .18s, color .18s; }
 .toolbar-icon:hover, .toolbar-action:hover { background: #eaf0e8; color: var(--ink); }
-.brand-lockup { display: flex; align-items: center; gap: 10px; padding-left: 3px; -webkit-app-region: drag; }
+.brand-lockup { display: flex; align-items: center; gap: 10px; padding-left: 3px; }
 .brand-mark { width: 28px; height: 28px; display: grid; place-items: center; background: var(--ink); color: var(--titlebar-background); border-radius: 8px; }
 .brand-name { font: 700 18px 'Space Grotesk', sans-serif; letter-spacing: 0; }
-.toolbar-spacer { flex: 1; -webkit-app-region: drag; }
+.toolbar-drag-handle { flex: 1; min-width: 24px; height: 100%; -webkit-app-region: drag; cursor: move; }
 .toolbar-controls { display: flex; align-items: center; gap: 12px; position: relative; z-index: 10; pointer-events: auto; }
 .window-controls { display: flex; align-items: center; gap: 2px; margin-left: 6px; -webkit-app-region: no-drag; }
 .window-control { width: 34px; height: 30px; border-radius: 5px; }
