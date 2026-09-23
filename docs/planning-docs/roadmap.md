@@ -42,7 +42,8 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [ ] Register Spotify application configuration and platform redirect URIs.
 - [-] Implement Authorization Code with PKCE.
 - [x] Keep access and refresh tokens in the main process and refresh access tokens when needed.
-- [ ] Implement sign-in, sign-out, missing-scope, expiry, rate-limit, and network-error states.
+- [x] Reuse an existing Spotify session across collection loads instead of re-authorizing every time.
+- [ ] Implement sign-out, missing-scope, expiry, rate-limit, and network-error states.
 - [x] Load public and authorized private/collaborative playlists through the Spotify API bridge.
 - [x] Load albums and preserve album track order through the Spotify API bridge.
 - [x] Document and surface the Spotify platform restriction on algorithmic/personalized playlists (in-app Help and error messages).

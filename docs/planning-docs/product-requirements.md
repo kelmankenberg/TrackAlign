@@ -87,6 +87,8 @@ The user can choose a folder and see supported audio files with their current fi
 
 The user can authenticate with Spotify, enter a playlist or album URL, and load the ordered track list. OAuth is also used for public collection access where the API requires an access token, not only for private playlists. The application must explain authorization failures, missing scopes, expired sessions, rate limits, and unavailable collections. Spotify client secrets and user passwords must never be requested or stored by the renderer.
 
+Authorization is triggered only when no valid cached session exists. A previously authorized session is reused (refreshing the access token silently if needed) for subsequent playlist/album loads within the same app run, so the user is not sent through the Spotify authorization browser flow every time.
+
 Spotify blocks third-party API access to algorithmic and personalized playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You, and similar) regardless of app configuration or account ownership. TrackAlign cannot bypass this restriction. Albums and manually created/curated playlists are unaffected. This limitation is explained in the app's Help content and in the error shown when such a playlist is rejected.
 
 ### FR-3: Generate Matches

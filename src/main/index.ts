@@ -135,6 +135,15 @@ async function getSpotifyAccessToken() {
   return spotifySession.accessToken
 }
 
+async function ensureSpotifyAccessToken() {
+  try {
+    return await getSpotifyAccessToken()
+  } catch {
+    await startSpotifyAuth()
+    return getSpotifyAccessToken()
+  }
+}
+
 function parseSpotifySource(sourceUrl: string) {
   const parsed = new URL(sourceUrl)
   const segments = parsed.pathname.split('/').filter(Boolean)
@@ -145,7 +154,7 @@ function parseSpotifySource(sourceUrl: string) {
 
 async function loadSpotifyCollection(sourceUrl: string) {
   const source = parseSpotifySource(sourceUrl)
-  const accessToken = await getSpotifyAccessToken()
+  const accessToken = await ensureSpotifyAccessToken()
   type SpotifyTrack = { name: string; duration_ms: number; artists: Array<{ name: string }> }
   let endpoint: string | null = source.type === 'playlist' ? `${spotifyApiBase}/playlists/${source.id}/tracks?limit=50` : `${spotifyApiBase}/albums/${source.id}/tracks?limit=50`
   const sourceTracks: SpotifyTrack[] = []
