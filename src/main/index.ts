@@ -1,7 +1,8 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, screen, shell } from 'electron'
 import { createServer } from 'node:http'
 import { randomBytes, createHash } from 'node:crypto'
 import { join } from 'node:path'
+import { readFileSync, writeFileSync } from 'node:fs'
 import 'dotenv/config'
 import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
 import { fetchSpotifyCollection } from '../shared/spotify'
@@ -179,11 +180,61 @@ async function undoLatestRename() {
   return runUndoLatestRename(historyPath())
 }
 
+interface WindowState {
+  width: number
+  height: number
+  x?: number
+  y?: number
+  isMaximized: boolean
+}
+
+const defaultWindowState: WindowState = { width: 1440, height: 900, isMaximized: false }
+
+function windowStatePath() {
+  return join(app.getPath('userData'), 'window-state.json')
+}
+
+function loadWindowState(): WindowState {
+  try {
+    const raw = readFileSync(windowStatePath(), 'utf-8')
+    const parsed = JSON.parse(raw) as Partial<WindowState>
+    if (typeof parsed.width !== 'number' || typeof parsed.height !== 'number') return defaultWindowState
+    const state: WindowState = { ...defaultWindowState, ...parsed }
+    if (typeof state.x === 'number' && typeof state.y === 'number') {
+      const onScreen = screen.getAllDisplays().some((display) => {
+        const bounds = display.workArea
+        return state.x! >= bounds.x && state.y! >= bounds.y && state.x! < bounds.x + bounds.width && state.y! < bounds.y + bounds.height
+      })
+      if (!onScreen) {
+        state.x = undefined
+        state.y = undefined
+      }
+    }
+    return state
+  } catch {
+    return defaultWindowState
+  }
+}
+
+function saveWindowState(window: BrowserWindow) {
+  const isMaximized = window.isMaximized()
+  const bounds = isMaximized ? window.getNormalBounds() : window.getBounds()
+  const state: WindowState = { width: bounds.width, height: bounds.height, x: bounds.x, y: bounds.y, isMaximized }
+  try {
+    writeFileSync(windowStatePath(), JSON.stringify(state))
+  } catch {
+    // best-effort persistence; ignore write failures
+  }
+}
+
 function createWindow() {
+  const savedState = loadWindowState()
   const window = new BrowserWindow({
     frame: false,
-    width: 1440,
-    height: 900,
+    width: savedState.width,
+    height: savedState.height,
+    x: savedState.x,
+    y: savedState.y,
     minWidth: 980,
     minHeight: 640,
     title: 'TrackAlign',
@@ -194,6 +245,20 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: false,
     },
+  })
+
+  if (savedState.isMaximized) window.maximize()
+
+  let saveTimeout: NodeJS.Timeout | undefined
+  const scheduleSave = () => {
+    if (saveTimeout) clearTimeout(saveTimeout)
+    saveTimeout = setTimeout(() => saveWindowState(window), 300)
+  }
+  window.on('resize', scheduleSave)
+  window.on('move', scheduleSave)
+  window.on('close', () => {
+    if (saveTimeout) clearTimeout(saveTimeout)
+    saveWindowState(window)
   })
 
   if (process.env.ELECTRON_RENDERER_URL) {
