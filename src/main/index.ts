@@ -7,6 +7,7 @@ import { join } from 'node:path'
 import { parseFile } from 'music-metadata'
 import 'dotenv/config'
 import { applyRenames as runApplyRenames, undoLatestRename as runUndoLatestRename, type RenameItem } from '../shared/renameService'
+import { fetchSpotifyCollection } from '../shared/spotify'
 
 app.disableHardwareAcceleration()
 
@@ -145,58 +146,18 @@ async function ensureSpotifyAccessToken() {
   }
 }
 
-function parseSpotifySource(sourceUrl: string) {
-  const parsed = new URL(sourceUrl)
-  const segments = parsed.pathname.split('/').filter(Boolean)
-  const type = segments[0]
-  if ((type !== 'playlist' && type !== 'album') || !segments[1]) throw new Error('Enter a Spotify playlist or album URL.')
-  return { type, id: segments[1] } as { type: 'playlist' | 'album'; id: string }
+async function loadSpotifyCollection(sourceUrl: string) {
+  const accessToken = await ensureSpotifyAccessToken()
+  return fetchSpotifyCollection(sourceUrl, accessToken, fetch, spotifyApiBase)
 }
 
-async function loadSpotifyCollection(sourceUrl: string) {
-  const source = parseSpotifySource(sourceUrl)
-  const accessToken = await ensureSpotifyAccessToken()
-  type SpotifyTrack = { name: string; duration_ms: number; artists: Array<{ name: string }>; album?: { name: string; release_date?: string } }
-  let endpoint: string | null = source.type === 'playlist' ? `${spotifyApiBase}/playlists/${source.id}/tracks?limit=50` : `${spotifyApiBase}/albums/${source.id}/tracks?limit=50`
-  const sourceTracks: SpotifyTrack[] = []
+function signOutSpotify() {
+  spotifySession = null
+  return { signedOut: true as const }
+}
 
-  let collectionName = source.type === 'playlist' ? 'Spotify playlist' : 'Spotify album'
-  let albumName = ''
-  let albumYear: number | null = null
-  const metaEndpoint = source.type === 'album' ? `${spotifyApiBase}/albums/${source.id}` : `${spotifyApiBase}/playlists/${source.id}?fields=name`
-  const metaResponse = await fetch(metaEndpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
-  if (metaResponse.ok) {
-    const metaPayload = await metaResponse.json() as { name?: string; release_date?: string }
-    if (metaPayload.name) collectionName = metaPayload.name
-    if (source.type === 'album') {
-      albumName = metaPayload.name ?? ''
-      albumYear = metaPayload.release_date ? Number(metaPayload.release_date.slice(0, 4)) || null : null
-    }
-  }
-
-  while (endpoint) {
-    const response = await fetch(endpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
-    if (!response.ok) {
-      const body = await response.json().catch(() => null) as { error?: { message?: string } } | null
-      const reason = body?.error?.message ? ` ${body.error.message}` : ''
-      const hint = response.status === 403 && source.type === 'playlist' ? ' Spotify blocks third-party access to algorithmic playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You). Try a playlist you created yourself.' : ''
-      throw new Error(`Spotify could not load this ${source.type} (${response.status}).${reason}${hint}`)
-    }
-    const payload = await response.json() as { items: Array<{ track?: SpotifyTrack } & SpotifyTrack>; next?: string | null }
-    sourceTracks.push(...payload.items.map((item) => source.type === 'playlist' ? item.track : item).filter((track): track is SpotifyTrack => Boolean(track)))
-    endpoint = payload.next ?? null
-  }
-
-  const tracks = sourceTracks.map((track, index) => ({
-    position: index + 1,
-    artist: track.artists.map((artist) => artist.name).join(', '),
-    title: track.name,
-    album: source.type === 'album' ? albumName : track.album?.name ?? '',
-    year: source.type === 'album' ? albumYear : (track.album?.release_date ? Number(track.album.release_date.slice(0, 4)) || null : null),
-    duration: `${Math.floor(track.duration_ms / 60000)}:${String(Math.floor(track.duration_ms / 1000) % 60).padStart(2, '0')}`,
-    durationMs: track.duration_ms,
-  }))
-  return { type: source.type, name: collectionName, url: sourceUrl, tracks }
+function spotifyStatus() {
+  return { connected: spotifySession !== null }
 }
 
 async function scanFolder(folderPath: string) {
@@ -300,6 +261,8 @@ app.whenReady().then(() => {
   ipcMain.handle('rename:undo-latest', undoLatestRename)
   ipcMain.handle('spotify:authenticate', startSpotifyAuth)
   ipcMain.handle('spotify:load-collection', (_event, sourceUrl: string) => loadSpotifyCollection(sourceUrl))
+  ipcMain.handle('spotify:sign-out', () => signOutSpotify())
+  ipcMain.handle('spotify:status', () => spotifyStatus())
   ipcMain.handle('window:minimize', (event) => {
     BrowserWindow.fromWebContents(event.sender)?.minimize()
     return true

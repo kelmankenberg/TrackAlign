@@ -37,6 +37,8 @@ interface Window {
 		spotify: {
 			authenticate: () => Promise<{ authenticated: true }>
 			loadCollection: (sourceUrl: string) => Promise<{ type: 'playlist' | 'album'; name: string; url: string; tracks: Array<{ position: number; artist: string; title: string; album: string; year: number | null; duration: string; durationMs?: number }> }>
+			signOut: () => Promise<{ signedOut: true }>
+			status: () => Promise<{ connected: boolean }>
 		}
 		window: {
 			minimize: () => Promise<boolean>

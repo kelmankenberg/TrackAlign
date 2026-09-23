@@ -45,14 +45,15 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 ## Spotify Integration
 
 - [ ] Register Spotify application configuration and platform redirect URIs.
-- [-] Implement Authorization Code with PKCE.
+- [x] Implement Authorization Code with PKCE.
 - [x] Keep access and refresh tokens in the main process and refresh access tokens when needed.
 - [x] Reuse an existing Spotify session across collection loads instead of re-authorizing every time.
-- [ ] Implement sign-out, missing-scope, expiry, rate-limit, and network-error states.
+- [x] Implement sign-out and a connection-status indicator; surface rate-limit (429, with Retry-After) and API error detail in load failures.
+  - [ ] Explicit missing-scope and network-offline UI states (currently covered by generic error messaging only).
 - [x] Load public and authorized private/collaborative playlists through the Spotify API bridge.
 - [x] Load albums and preserve album track order through the Spotify API bridge.
 - [x] Document and surface the Spotify platform restriction on algorithmic/personalized playlists (in-app Help and error messages).
-- [ ] Preserve playlist positions and duplicate playlist occurrences.
+- [x] Preserve playlist positions and duplicate playlist occurrences (unit-tested in `src/shared/spotify.test.ts`).
 - [x] Provide playlist/album URL loading and ordered collection preview through the Spotify API bridge.
 
 ## Matching and Review
@@ -62,7 +63,7 @@ Status key: `[ ]` not started, `[-]` in progress, `[x]` complete, `[!]` blocked 
 - [x] Implement initial one-to-one assignment by collection occurrence.
 - [x] Show every proposal, confidence, evidence, and warning in the review table.
 - [x] Support manual reassignment, exclusion, and unmatched files.
-- [ ] Preserve collection-position numbering gaps.
+- [x] Preserve collection-position numbering gaps (unmatched/excluded tracks are simply not renamed, so no renumbering occurs).
 
 ## Rename and Recovery
 
