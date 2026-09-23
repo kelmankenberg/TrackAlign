@@ -43,7 +43,8 @@
       "output": "release"
     },
     "files": [
-      "out/**/*"
+      "out/**/*",
+      "resources/**/*"
     ],
     "linux": {
       "target": [
@@ -51,13 +52,15 @@
         "deb"
       ],
       "category": "AudioVideo",
-      "maintainer": "TrackAlign"
+      "maintainer": "TrackAlign",
+      "icon": "build/icon.png"
     },
     "win": {
       "target": [
         "nsis",
         "portable"
-      ]
+      ],
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": false,

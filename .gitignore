@@ -4,7 +4,6 @@
 # Node and Electron artifacts
 node_modules/
 dist/
-build/
 out/
 release/
 
