@@ -155,7 +155,8 @@ async function loadSpotifyCollection(sourceUrl: string) {
     if (!response.ok) {
       const body = await response.json().catch(() => null) as { error?: { message?: string } } | null
       const reason = body?.error?.message ? ` ${body.error.message}` : ''
-      throw new Error(`Spotify could not load this ${source.type} (${response.status}).${reason}`)
+      const hint = response.status === 403 && source.type === 'playlist' ? ' Spotify blocks third-party access to algorithmic playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You). Try a playlist you created yourself.' : ''
+      throw new Error(`Spotify could not load this ${source.type} (${response.status}).${reason}${hint}`)
     }
     const payload = await response.json() as { items: Array<{ track?: SpotifyTrack } & SpotifyTrack>; next?: string | null }
     sourceTracks.push(...payload.items.map((item) => source.type === 'playlist' ? item.track : item).filter((track): track is SpotifyTrack => Boolean(track)))
