@@ -152,7 +152,11 @@ async function loadSpotifyCollection(sourceUrl: string) {
 
   while (endpoint) {
     const response = await fetch(endpoint, { headers: { Authorization: `Bearer ${accessToken}` } })
-    if (!response.ok) throw new Error(`Spotify could not load this ${source.type} (${response.status}). Check access and the URL.`)
+    if (!response.ok) {
+      const body = await response.json().catch(() => null) as { error?: { message?: string } } | null
+      const reason = body?.error?.message ? ` ${body.error.message}` : ''
+      throw new Error(`Spotify could not load this ${source.type} (${response.status}).${reason}`)
+    }
     const payload = await response.json() as { items: Array<{ track?: SpotifyTrack } & SpotifyTrack>; next?: string | null }
     sourceTracks.push(...payload.items.map((item) => source.type === 'playlist' ? item.track : item).filter((track): track is SpotifyTrack => Boolean(track)))
     endpoint = payload.next ?? null
