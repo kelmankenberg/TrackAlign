@@ -205,6 +205,7 @@ function App() {
   const [expandedHelp, setExpandedHelp] = useState('')
   const [status, setStatus] = useState('Ready for a folder')
   const [zoomFactor, setZoomFactor] = useState(() => clampZoom(Number(localStorage.getItem('trackalign-zoom')) || 1))
+  const [appVersion, setAppVersion] = useState('')
 
   const applyZoom = (factor: number) => {
     const clamped = clampZoom(factor)
@@ -215,6 +216,7 @@ function App() {
 
   useEffect(() => {
     window.trackAlign.zoom.set(zoomFactor).catch(() => undefined)
+    window.trackAlign.appVersion().then(setAppVersion).catch(() => undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -308,7 +310,7 @@ function App() {
           <button onClick={() => { setPanel('changelog'); setMoreOpen(false) }}><History size={16} />Changelog</button>
           <button onClick={() => { runWindowCommand(() => window.trackAlign.window.toggleDevTools(), 'Developer Tools'); setMoreOpen(false) }}><Settings size={16} />Developer Tools</button>
           <button onClick={() => { setPanel('report-issue'); setMoreOpen(false) }}><MessageSquareText size={16} />Report an issue</button>
-          <div className="menu-version">TrackAlign 0.1.0</div>
+          <div className="menu-version">{window.trackAlign.appName}{appVersion ? ` ${appVersion}` : ''}</div>
         </div>}
       </header>
 

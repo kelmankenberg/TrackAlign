@@ -10,6 +10,7 @@ if (typeof window !== 'undefined') {
     configurable: true,
     value: {
       appName: 'TrackAlign',
+      appVersion: vi.fn().mockResolvedValue('0.2.0'),
       inspectFolder: vi.fn().mockResolvedValue({ cancelled: true }),
       refreshFolder: vi.fn().mockResolvedValue({ cancelled: false, folderPath: '/tmp/music', ignoredSymlinkCount: 0, files: [] }),
       rename: {

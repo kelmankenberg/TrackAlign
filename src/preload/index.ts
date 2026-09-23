@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('trackAlign', {
   appName: 'TrackAlign',
+  appVersion: () => ipcRenderer.invoke('app:get-version'),
   inspectFolder: () => ipcRenderer.invoke('folder:inspect'),
   refreshFolder: (folderPath: string) => ipcRenderer.invoke('folder:refresh', folderPath),
   rename: {

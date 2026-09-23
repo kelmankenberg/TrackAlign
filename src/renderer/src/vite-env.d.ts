@@ -28,6 +28,7 @@ interface FolderInventory {
 interface Window {
 	trackAlign: {
 		appName: string
+		appVersion: () => Promise<string>
 		inspectFolder: () => Promise<FolderInventory>
 		refreshFolder: (folderPath: string) => Promise<FolderInventory>
 		rename: {

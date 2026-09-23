@@ -194,6 +194,16 @@ describe('App shell', () => {
     expect(await screen.findByRole('button', { name: /connect github/i })).toBeInTheDocument()
   })
 
+  it('shows the package-derived app version in the More menu', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'More options' }))
+
+    expect(await screen.findByText('TrackAlign 0.2.0')).toBeInTheDocument()
+    expect(window.trackAlign.appVersion).toHaveBeenCalled()
+  })
+
   it('renders the Markdown changelog as collapsible release sections', async () => {
     const user = userEvent.setup()
     render(<App />)

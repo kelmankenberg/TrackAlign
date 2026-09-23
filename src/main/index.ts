@@ -491,6 +491,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null)
+  ipcMain.handle('app:get-version', () => app.getVersion())
   ipcMain.handle('folder:inspect', inspectFolder)
   ipcMain.handle('folder:refresh', (_event, folderPath: string) => scanFolder(folderPath))
   ipcMain.handle('rename:apply', (_event, items: RenameItem[]) => applyRenames(items))
