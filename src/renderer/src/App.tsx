@@ -206,10 +206,10 @@ function App() {
           </div>
         </div>
         {moreOpen && <div className="more-menu">
-          <button onClick={() => { setPanel('report-issue'); setMoreOpen(false) }}><MessageSquareText size={16} />Report an issue</button>
           <button onClick={() => window.location.reload()}><RotateCcw size={16} />Restart TrackAlign</button>
           <button onClick={() => { setPanel('changelog'); setMoreOpen(false) }}><History size={16} />Changelog</button>
           <button onClick={() => { runWindowCommand(() => window.trackAlign.window.toggleDevTools(), 'Developer Tools'); setMoreOpen(false) }}><Settings size={16} />Developer Tools</button>
+          <button onClick={() => { setPanel('report-issue'); setMoreOpen(false) }}><MessageSquareText size={16} />Report an issue</button>
           <div className="menu-version">TrackAlign 0.1.0</div>
         </div>}
       </header>
