@@ -41,7 +41,7 @@ export function parseSpotifySource(sourceUrl: string): SpotifySource {
 
 export function describeSpotifyApiError(status: number, body: { error?: { message?: string } } | null, sourceType: SpotifySourceType, retryAfterSeconds?: number) {
   const reason = body?.error?.message ? ` ${body.error.message}` : ''
-  const hint = status === 403 && sourceType === 'playlist' ? ' Spotify blocks third-party access to algorithmic playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You). Try a playlist you created yourself.' : ''
+  const hint = status === 403 && sourceType === 'playlist' ? ' Spotify blocks third-party apps from loading algorithmic playlists (Discover Weekly, Daily Mix, Release Radar, Blend, Made For You) and, without extended API access, playlists not owned or followed by the connected account. Try a playlist you created yourself, or one you follow.' : ''
   const rateLimitHint = status === 429 ? ` Spotify is rate-limiting requests${retryAfterSeconds ? `; try again in about ${retryAfterSeconds} second${retryAfterSeconds === 1 ? '' : 's'}` : ''}.` : ''
   return `Spotify could not load this ${sourceType} (${status}).${reason}${hint}${rateLimitHint}`
 }
